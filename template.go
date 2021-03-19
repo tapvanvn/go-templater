@@ -6,11 +6,22 @@ import (
 	"os"
 )
 
+type LanguageType = int
+
+const (
+	HTML LanguageType = iota
+	JS
+	CSS
+	JSON
+	TXT
+)
+
 type Template struct {
-	ID      string //each teample has an id, the value is absolute path of that template file
-	Path    string
-	Error   error
-	IsReady bool
+	ID           string //each teample has an id, the value is absolute path of that template file
+	Path         string
+	Error        error
+	IsReady      bool
+	HostLanguage LanguageType
 }
 
 func (template *Template) Render(context *Context) (string, error) {

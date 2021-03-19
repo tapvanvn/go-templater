@@ -112,9 +112,10 @@ func (tpt *templater) GetTemplate(id string) *Template {
 		return template
 	}
 	template := &Template{
-		ID:      id,
-		IsReady: false,
-		Error:   nil,
+		ID:           id,
+		IsReady:      false,
+		Error:        nil,
+		HostLanguage: TXT,
 	}
 	tpt.loadedTemplate[id] = template
 
@@ -122,6 +123,21 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	if err != nil {
 		template.Error = err
 		return template
+	}
+	numSegment := len(loadPath)
+
+	lastSegment := loadPath[numSegment-1]
+
+	extPos := strings.LastIndex(lastSegment, ".")
+	if extPos >= 0 {
+		ext := strings.ToLower(lastSegment[extPos+1:])
+		if ext == "html" || ext == "htm" {
+			template.HostLanguage = HTML
+		} else if ext == "js" {
+			template.HostLanguage = JS
+		} else if ext == "json" {
+			template.HostLanguage = JSON
+		}
 	}
 	template.Path = "/" + strings.Join(loadPath, "/")
 	template.IsReady = true
