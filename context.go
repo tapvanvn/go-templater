@@ -1,4 +1,4 @@
 package gotemplater
 
-type TemplateContext struct {
+type Context struct {
 }
