@@ -91,7 +91,7 @@ func (tpt *templater) GetPath(id string) ([]string, error) {
 	return mergeSegments, nil
 }
 
-func (tpt *templater) Render(id string, context *Context) string {
+func (tpt *templater) Render(id string, context *Context) (string, error) {
 
 	template := tpt.GetTemplate(id)
 
@@ -99,11 +99,11 @@ func (tpt *templater) Render(id string, context *Context) string {
 
 		content, err := template.Render(context)
 		if err != nil {
-			return "TODO: render error"
+			return "", errors.New("render error")
 		}
-		return content
+		return content, nil
 	}
-	return "TODO: render not ready"
+	return "", errors.New("renderer not ready")
 }
 
 func (tpt *templater) GetTemplate(id string) *Template {
