@@ -75,7 +75,7 @@ func (tpt *templater) GetPath(id string) ([]string, error) {
 
 func (tpt *templater) Render(id string, context *Context) (string, error) {
 
-	template := tpt.GetTemplate(id)
+	/*template := tpt.GetTemplate(id)
 
 	if template.IsReady {
 
@@ -84,7 +84,7 @@ func (tpt *templater) Render(id string, context *Context) (string, error) {
 			return "", errors.New("render error")
 		}
 		return content, nil
-	}
+	}*/
 	return "", errors.New("renderer not ready")
 }
 
@@ -93,18 +93,14 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	if template, ok := tpt.loadedTemplate[id]; ok {
 		return template
 	}
-	template := &Template{
-		ID:           id,
-		IsReady:      false,
-		Error:        nil,
-		HostLanguage: TXT,
-	}
-	tpt.loadedTemplate[id] = template
+	template := CreateTemplate(id, TXT)
+
+	tpt.loadedTemplate[id] = &template
 
 	loadPath, err := tpt.GetPath(id)
 	if err != nil {
 		template.Error = err
-		return template
+		return &template
 	}
 	numSegment := len(loadPath)
 
@@ -123,5 +119,9 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	}
 	template.Path = loadPath
 	template.IsReady = true
-	return template
+	err = template.load()
+	if err != nil {
+
+	}
+	return &template
 }

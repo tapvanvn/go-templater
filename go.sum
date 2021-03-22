@@ -1,1 +1,17 @@
+github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
+github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/tapvanvn/gosmartstring v0.0.1-0.20210322071850-8fca60932d05/go.mod h1:qvdJTN04rN5+t9B8rIaA1U/ac9S1m5xOGWC1l0gDyuc=
+github.com/tapvanvn/gosmartstring v0.0.1-alpha.1/go.mod h1:4W6iE5b7NBOig4ox+pSgk0cXHTHVDRF9I5RuaSIOJCc=
+github.com/tapvanvn/gosmartstring v0.0.1-alpha.2/go.mod h1:m8dXy4IWzvH/ZDjvxEoiXoXFY/5p+JaAolDcT7yGL+U=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.4 h1:iYaBwiLNQX6dF9TYHs8Xt3pN3PdpLoZJj9NJXi36FWQ=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.4/go.mod h1:m8dXy4IWzvH/ZDjvxEoiXoXFY/5p+JaAolDcT7yGL+U=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.5 h1:0l6kzrLU2V/d5DmCfPzFdb6TBZpZhhZBE15xpM+JCNU=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.5/go.mod h1:m8dXy4IWzvH/ZDjvxEoiXoXFY/5p+JaAolDcT7yGL+U=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.6 h1:Agzo042jcfDH6djkuvnbso7nqvHnHGvz1rmq2wiaYFk=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.6/go.mod h1:FZDXQadh0rPPQC0JSutuMuiIMdlfDmlDe9UGQCzHpv8=
 github.com/tapvanvn/gotokenize v1.0.3/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
+github.com/tapvanvn/gotokenize v1.0.4/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
+github.com/tapvanvn/gotokenize v1.0.5-alpha.1 h1:fm+k8BTQYXpV1pW45BSOvU5kxkP1fu006A3Rnfb70AY=
+github.com/tapvanvn/gotokenize v1.0.5-alpha.1/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
+github.com/tapvanvn/gotokenize v1.0.5-alpha.2 h1:UH2T+PMaCKlX5wEbR7TnWPymVrjHEBT9rysjyeqLjcE=
+github.com/tapvanvn/gotokenize v1.0.5-alpha.2/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
