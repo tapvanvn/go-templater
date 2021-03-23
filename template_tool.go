@@ -1,4 +1,4 @@
-package worker
+package gotemplater
 
 import (
 	html "github.com/tapvanvn/gotemplater/tokenize/html"

@@ -11,7 +11,7 @@ import (
 
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater"
-	"github.com/tapvanvn/gotemplater/smartstring"
+
 	html "github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/xml"
@@ -46,7 +46,7 @@ func TestNamespace(t *testing.T) {
 	stream.Tokenize(string(bytes))
 
 	meaning := html.CreateHTMLInstructionMeaning()
-	meaning.Prepare(&stream)
+	meaning.Prepare(&stream, ss.CreateContext(gotemplater.CreateHTMLRuntime()))
 
 	token := meaning.Next()
 
@@ -72,12 +72,13 @@ func TestInstructionTemplate(t *testing.T) {
 	templater := gotemplater.GetTemplater()
 	templater.AddNamespace("test", rootPath+"/test")
 
-	context := ss.CreateContext(smartstring.HTMLRuntime)
+	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
 
 	instructionDo := ss.BuildInstructionDo("template",
 		[]ss.IObject{ss.CreateString("test:html/index.html")}, context)
 
 	compiler := ss.SSCompiler{}
+
 	compiler.Compile(&instructionDo, context)
 
 	time.Sleep(time.Second * 2)

@@ -6,7 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
+	"github.com/tapvanvn/gotemplater/utility"
 	"github.com/tapvanvn/gotokenize"
 )
 
@@ -28,8 +30,8 @@ type Template struct {
 	Error        error
 	IsReady      bool
 	HostLanguage LanguageType
-
 	Stream       gotokenize.TokenStream
+	Context      *gosmartstring.SSContext
 	instructions []*gotokenize.Token
 }
 
@@ -37,10 +39,12 @@ func CreateTemplate(id string, hostLanguage LanguageType) Template {
 	return Template{
 		IObject:      ss.SSObject{},
 		ID:           id,
-		IsReady:      false,
+		Path:         []string{},
 		Error:        nil,
+		IsReady:      false,
 		HostLanguage: hostLanguage,
 		Stream:       gotokenize.CreateStream(),
+		Context:      gosmartstring.CreateContext(CreateHTMLRuntime()),
 		instructions: []*gotokenize.Token{},
 	}
 }
@@ -48,7 +52,7 @@ func CreateTemplate(id string, hostLanguage LanguageType) Template {
 //GetRelativePath get
 func (template *Template) GetRelativePath(path string) ([]string, error) {
 
-	return GetAbsolutePath(template.Path, path)
+	return utility.GetAbsolutePath(template.Path, path)
 }
 
 func (template *Template) load() error {

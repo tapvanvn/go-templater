@@ -1,4 +1,4 @@
-package gotemplater
+package utility
 
 import (
 	"errors"

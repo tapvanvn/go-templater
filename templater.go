@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tapvanvn/gotemplater/worker"
+	"github.com/tapvanvn/gosmartstring"
+	"github.com/tapvanvn/gotemplater/utility"
 	"github.com/tapvanvn/goworker"
 )
 
@@ -21,11 +22,13 @@ var Templater *templater = nil
 func InitTemplater(numWorker int) error {
 	if Templater == nil {
 
+		gosmartstring.SSInsructionMove(5000)
+
 		Templater = &templater{
 			namespaces:     map[string][]string{},
 			loadedTemplate: map[string]*Template{},
 		}
-		goworker.AddTool("template_tool", &worker.TemplateBlacksmith{})
+		goworker.AddTool("template_tool", &TemplateBlacksmith{})
 
 		if numWorker < 1 {
 			goworker.OrganizeWorker(1)
@@ -91,9 +94,10 @@ func (tpt *templater) GetPath(id string) ([]string, error) {
 		return nil, errors.New("namespace is not defined")
 	}
 
-	return GetAbsolutePath(nsPathSegments, relativePath)
+	return utility.GetAbsolutePath(nsPathSegments, relativePath)
 }
 
+/*
 func (tpt *templater) Render(id string, context *Context) (string, error) {
 
 	/*template := tpt.GetTemplate(id)
@@ -105,10 +109,10 @@ func (tpt *templater) Render(id string, context *Context) (string, error) {
 			return "", errors.New("render error")
 		}
 		return content, nil
-	}*/
+	}*/ /*
 	return "", errors.New("renderer not ready")
 }
-
+*/
 func (tpt *templater) GetTemplate(id string) *Template {
 
 	fmt.Println("begin load", id)
