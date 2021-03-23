@@ -15,3 +15,5 @@ github.com/tapvanvn/gotokenize v1.0.5-alpha.1 h1:fm+k8BTQYXpV1pW45BSOvU5kxkP1fu0
 github.com/tapvanvn/gotokenize v1.0.5-alpha.1/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/gotokenize v1.0.5-alpha.2 h1:UH2T+PMaCKlX5wEbR7TnWPymVrjHEBT9rysjyeqLjcE=
 github.com/tapvanvn/gotokenize v1.0.5-alpha.2/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
+github.com/tapvanvn/goworker v1.1.0 h1:kdVc3FBmGcHw0NeBeD7XmE5waNyDDOxvY4z23a8xa2U=
+github.com/tapvanvn/goworker v1.1.0/go.mod h1:6VM5Oqp+TLPjVTzqeCyDWXJO/b5qie8C/upOBbP1EZc=

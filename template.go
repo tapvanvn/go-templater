@@ -29,7 +29,7 @@ type Template struct {
 	IsReady      bool
 	HostLanguage LanguageType
 
-	stream       gotokenize.TokenStream
+	Stream       gotokenize.TokenStream
 	instructions []*gotokenize.Token
 }
 
@@ -40,7 +40,7 @@ func CreateTemplate(id string, hostLanguage LanguageType) Template {
 		IsReady:      false,
 		Error:        nil,
 		HostLanguage: hostLanguage,
-		stream:       gotokenize.CreateStream(),
+		Stream:       gotokenize.CreateStream(),
 		instructions: []*gotokenize.Token{},
 	}
 }
@@ -78,6 +78,6 @@ func (template *Template) load() error {
 	stream := gotokenize.CreateStream()
 	stream.Tokenize(string(bytes))
 
-	template.stream.Tokenize(string(bytes))
+	template.Stream.Tokenize(string(bytes))
 	return nil
 }

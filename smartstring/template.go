@@ -21,8 +21,8 @@ func SSFTemplate(context *ss.SSContext, input ss.IObject, params []ss.IObject) s
 				return template
 			}
 			fmt.Print("id", id)
-			templater := gotemplater.InitTemplater()
-			_ = templater
+			templater := gotemplater.GetTemplater()
+			templater.GetTemplate(id)
 		}
 	}
 	return nil

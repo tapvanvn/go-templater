@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/tapvanvn/gotemplater/worker"
+	"github.com/tapvanvn/goworker"
 )
 
 //Templater manage
@@ -15,11 +18,29 @@ type templater struct {
 var Templater *templater = nil
 
 //InitTemplater should call once at begining of app to init templater
-func InitTemplater() *templater {
+func InitTemplater(numWorker int) error {
 	if Templater == nil {
+
 		Templater = &templater{
 			namespaces:     map[string][]string{},
 			loadedTemplate: map[string]*Template{},
+		}
+		goworker.AddTool("template_tool", &worker.TemplateBlacksmith{})
+
+		if numWorker < 1 {
+			goworker.OrganizeWorker(1)
+		} else {
+			goworker.OrganizeWorker(numWorker)
+		}
+
+		return nil
+	}
+	return errors.New("templater already init")
+}
+func GetTemplater() *templater {
+	if Templater == nil {
+		if err := InitTemplater(1); err != nil {
+			panic(err)
 		}
 	}
 	return Templater
@@ -90,7 +111,9 @@ func (tpt *templater) Render(id string, context *Context) (string, error) {
 
 func (tpt *templater) GetTemplate(id string) *Template {
 
+	fmt.Println("begin load", id)
 	if template, ok := tpt.loadedTemplate[id]; ok {
+		fmt.Println("template loaded")
 		return template
 	}
 	template := CreateTemplate(id, TXT)
@@ -99,6 +122,7 @@ func (tpt *templater) GetTemplate(id string) *Template {
 
 	loadPath, err := tpt.GetPath(id)
 	if err != nil {
+		fmt.Println(err.Error())
 		template.Error = err
 		return &template
 	}
@@ -120,8 +144,17 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	template.Path = loadPath
 	template.IsReady = true
 	err = template.load()
-	if err != nil {
 
+	if err != nil {
+		template.Error = err
+		fmt.Println(err.Error())
+		return &template
 	}
+	//call build template task
+	task := &TemplateBuildTask{
+		template: &template,
+	}
+	goworker.AddTask(task)
+	fmt.Println("loading")
 	return &template
 }
