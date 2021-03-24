@@ -1,7 +1,7 @@
 package gotemplater
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -63,7 +63,6 @@ func (template *Template) load() error {
 
 			return template.Error
 		}
-		return errors.New("template error")
 	}
 
 	path := "/" + strings.Join(template.Path, "/")
@@ -84,4 +83,11 @@ func (template *Template) load() error {
 
 	template.Stream.Tokenize(string(bytes))
 	return nil
+}
+
+func (template *Template) build(context *gosmartstring.SSContext) {
+	fmt.Println("build")
+	compiler := ss.SSCompiler{}
+	template.Stream.Debug(0, nil)
+	compiler.Compile(&template.Stream, context)
 }

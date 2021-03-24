@@ -15,6 +15,8 @@ github.com/tapvanvn/gosmartstring v0.0.2-alpha.8 h1:EXjsu3z1uoup/YB9dM0LubY3bK4W
 github.com/tapvanvn/gosmartstring v0.0.2-alpha.8/go.mod h1:VZQZZ04eZP0Exifm+Eqailv27sHzt2vkbEd0Ht5RnQ8=
 github.com/tapvanvn/gosmartstring v0.0.2-alpha.9 h1:9N/uyrKlFyJOxF9n59ERNuRt1wpzQDTvFYeY0N3eExs=
 github.com/tapvanvn/gosmartstring v0.0.2-alpha.9/go.mod h1:VZQZZ04eZP0Exifm+Eqailv27sHzt2vkbEd0Ht5RnQ8=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.10 h1:frOwWqBq7re3KOVc1PvVQKWuavh+8Is3Mi6XGb4ehBc=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.10/go.mod h1:VZQZZ04eZP0Exifm+Eqailv27sHzt2vkbEd0Ht5RnQ8=
 github.com/tapvanvn/gotokenize v1.0.3/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/gotokenize v1.0.4/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/gotokenize v1.0.5-alpha.1 h1:fm+k8BTQYXpV1pW45BSOvU5kxkP1fu006A3Rnfb70AY=

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/xml"
@@ -97,30 +98,59 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 	if head == nil {
 		return errors.New("syntax error")
 	}
+	output := gotokenize.Token{
+		Type:    gosmartstring.TokenSSRegistryGlobal,
+		Content: context.Root.IssueAddress(),
+	}
+	tmpStream.AddToken(output)
+
 	iter = head.Children.Iterator()
+	findID := false
 	for {
 		headToken := iter.Read()
 		if headToken == nil {
 			break
 		}
+
 		if headToken.Type != xml.TokenXMLAttribute {
+
 			continue
 		}
-		if strings.ToLower(headToken.Content) == "id" {
-			tmpStream.AddToken(*headToken)
+		attIter := headToken.Children.Iterator()
+		keyToken := attIter.Read()
+		valueToken := attIter.Read()
+
+		if keyToken != nil && valueToken != nil {
+			if strings.ToLower(keyToken.Content) == "id" {
+				address := uuid.New().String()
+				idToken := gotokenize.Token{
+					Type:    gosmartstring.TokenSSRegistry,
+					Content: address,
+				}
+				id := strings.TrimSpace(valueToken.Children.ConcatStringContent())
+				fmt.Println("regist id:", id, "address", address)
+				context.Root.RegisterObject(address, gosmartstring.CreateString(id))
+				tmpStream.AddToken(idToken)
+				findID = true
+			}
+
 		} else if headToken.Content != "" {
 			return errors.New("syntax error unknow attribute " + headToken.Content)
 		}
 		fmt.Println(headToken.Content, headToken.Children.ConcatStringContent())
 	}
 	token.Children = tmpStream
+
+	if !findID {
+		return errors.New("template syntax error no id found")
+	}
 	return nil
 }
 
 func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Token, context *gosmartstring.SSContext) error {
 	token.Type = gosmartstring.TokenSSInstructionEach
 	//for content is loop pack name
-	token.Content = "for"
+	token.Content = ""
 	tmpChildren := gotokenize.CreateStream()
 
 	iter := token.Children.Iterator()
@@ -129,7 +159,13 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 		return errors.New("syntax error")
 	}
 	headIter := head.Children.Iterator()
-	insParams := [2]gotokenize.Token{}
+	outputToken := gotokenize.Token{
+		Type:    gosmartstring.TokenSSRegistryGlobal,
+		Content: context.Root.IssueAddress(),
+	}
+	elementToken := gotokenize.Token{
+		Type: gosmartstring.TokenSSRegistry,
+	}
 	for {
 		headToken := headIter.Read()
 		if headToken == nil {
@@ -139,20 +175,16 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 			continue
 		}
 		if headToken.Content == "each" {
-			insParams[1] = *headToken
+			elementToken.Content = headToken.Content
 		} else if headToken.Content == "in" {
-			insParams[0] = *headToken
+			token.Content = headToken.Content
 		} else if headToken.Content != "" {
 			return errors.New("syntax error unknown" + headToken.Content)
 		}
 	}
+	tmpChildren.AddToken(outputToken)
+	tmpChildren.AddToken(elementToken)
 
-	tmpChildren.AddToken(insParams[0])
-	tmpChildren.AddToken(insParams[1])
-
-	packToken := gotokenize.Token{
-		Type: gosmartstring.TokenSSInstructionPack,
-	}
 	for {
 		childToken := iter.Read()
 		if childToken == nil {
@@ -161,9 +193,9 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 		if err := meaning.buildElement(childToken, context); err != nil {
 			continue
 		}
-		packToken.Children.AddToken(*childToken)
+		tmpChildren.AddToken(*childToken)
 	}
-	tmpChildren.AddToken(packToken)
+
 	token.Children = tmpChildren
 	return nil
 }

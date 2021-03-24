@@ -21,7 +21,7 @@ func (task *TemplateBuildTask) Process(tool interface{}) {
 
 			//Todo find instruction
 		}
-		tmpStream.Debug(0, nil)
+		//tmpStream.Debug(0, nil)
 		task.template.Stream = tmpStream
 		task.template.IsReady = true
 	}

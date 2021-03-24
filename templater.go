@@ -146,7 +146,7 @@ func (tpt *templater) GetTemplate(id string) *Template {
 		}
 	}
 	template.Path = loadPath
-	template.IsReady = true
+
 	err = template.load()
 
 	if err != nil {

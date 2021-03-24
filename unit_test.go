@@ -74,12 +74,14 @@ func TestInstructionTemplate(t *testing.T) {
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
 
-	instructionDo := ss.BuildInstructionDo("template",
+	instructionDo := ss.BuildDo("template",
 		[]ss.IObject{ss.CreateString("test:html/index.html")}, context)
 
-	compiler := ss.SSCompiler{}
+	stream := gotokenize.CreateStream()
+	stream.AddToken(instructionDo)
 
-	compiler.Compile(&instructionDo, context)
+	compiler := ss.SSCompiler{}
+	compiler.Compile(&stream, context)
 
 	time.Sleep(time.Second * 2)
 }
