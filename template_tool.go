@@ -4,6 +4,9 @@ import (
 	html "github.com/tapvanvn/gotemplater/tokenize/html"
 )
 
-type TemplateTool struct {
+type TemplateBuildTool struct {
 	HTML html.HTMLInstructionMeaning
+}
+
+type TemplateRenderTool struct {
 }

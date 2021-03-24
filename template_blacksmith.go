@@ -4,14 +4,24 @@ import (
 	"github.com/tapvanvn/gotemplater/tokenize/html"
 )
 
-type TemplateBlacksmith struct {
+type TemplateBuildBlacksmith struct {
 }
 
 //Make make tool
-func (blacksmith *TemplateBlacksmith) Make() interface{} {
+func (blacksmith *TemplateBuildBlacksmith) Make() interface{} {
 
-	tool := &TemplateTool{
+	tool := &TemplateBuildTool{
 		HTML: html.CreateHTMLInstructionMeaning(),
 	}
+	return tool
+}
+
+type TemplateRenderBlacksmith struct {
+}
+
+//Make make tool
+func (blacksmith *TemplateRenderBlacksmith) Make() interface{} {
+
+	tool := &TemplateRenderTool{}
 	return tool
 }

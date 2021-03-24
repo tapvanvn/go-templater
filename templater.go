@@ -28,7 +28,7 @@ func InitTemplater(numWorker int) error {
 			namespaces:     map[string][]string{},
 			loadedTemplate: map[string]*Template{},
 		}
-		goworker.AddTool("template_tool", &TemplateBlacksmith{})
+		goworker.AddTool("template_build", &TemplateBuildBlacksmith{})
 
 		if numWorker < 1 {
 			goworker.OrganizeWorker(1)

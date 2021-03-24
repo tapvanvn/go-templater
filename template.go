@@ -94,3 +94,16 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 
 	return err
 }
+
+func (template Template) CanExport() bool {
+	return true
+}
+
+func (template Template) Export(context *gosmartstring.SSContext) []byte {
+
+	return []byte("hehehe")
+}
+
+func (obj Template) GetType() string {
+	return "template"
+}

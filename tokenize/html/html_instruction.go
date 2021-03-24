@@ -54,8 +54,41 @@ func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, c
 	meaning.SetStream(tmpStream)
 }
 
-func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token) {
+func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, context *gosmartstring.SSContext) {
+	token.Children.Debug(0, nil)
+	iter := token.Children.Iterator()
+	for {
+		childToken := iter.Read()
+		if childToken == nil {
+			break
+		}
+		if childToken.Type != xml.TokenXMLAttribute {
+			continue
+		}
+		childIter := childToken.Children.Iterator()
+		key := childIter.Get()
+		value := childIter.GetAt(1)
 
+		if value != nil && value.Type == xml.TokenXMLString {
+			content := value.Children.ConcatStringContent()
+			if strings.Index(content, "{{") > -1 {
+				fmt.Println("found smartstring at" + key.Content)
+				meaning.SS.Prepare(&value.Children, context)
+				tmpStream := gotokenize.CreateStream()
+				ssToken := meaning.SS.Next()
+				for {
+					if ssToken == nil {
+						break
+					}
+					tmpStream.AddToken(*ssToken)
+					ssToken = meaning.SS.Next()
+				}
+				value.Content = ""
+				value.Type = gosmartstring.TokenSSLSmarstring
+				value.Children = tmpStream
+			}
+		}
+	}
 }
 
 func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, context *gosmartstring.SSContext) error {
@@ -72,7 +105,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 		head := iter.Read()
 		tmpStream := gotokenize.CreateStream()
 		if head != nil {
-			meaning.buildHead(head)
+			meaning.buildHead(head, context)
 			tmpStream.AddToken(*head)
 		}
 		for {

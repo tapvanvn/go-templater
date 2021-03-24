@@ -1,15 +1,11 @@
 package gotemplater
 
-import (
-	"github.com/tapvanvn/gotokenize"
-)
-
-type TemplateBuildTask struct {
+type TemplateRenderTask struct {
 	template *Template
 }
 
-func (task *TemplateBuildTask) Process(tool interface{}) {
-	if templateTool, ok := tool.(*TemplateBuildTool); ok {
+func (task *TemplateRenderTask) Process(tool interface{}) {
+	/*if templateTool, ok := tool.(*TemplateBuildTool); ok {
 		templateTool.HTML.Prepare(&task.template.Stream, task.template.Context)
 		tmpStream := gotokenize.CreateStream()
 		for {
@@ -24,9 +20,9 @@ func (task *TemplateBuildTask) Process(tool interface{}) {
 		//tmpStream.Debug(0, nil)
 		task.template.Stream = tmpStream
 		task.template.IsReady = true
-	}
+	}*/
 }
 
-func (task *TemplateBuildTask) ToolLabel() string {
-	return "template_build"
+func (task *TemplateRenderTask) ToolLabel() string {
+	return "template_render"
 }

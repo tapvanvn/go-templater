@@ -92,5 +92,13 @@ func TestInstructionTemplate(t *testing.T) {
 		fmt.Println(err.Error())
 		context.PrintDebug()
 	}
+	fmt.Println("-----FINISH------")
+	renderer := gotemplater.Renderer{}
+	resultContent, err := renderer.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(resultContent)
+	//stream.Debug(0, nil)
 	time.Sleep(time.Second * 15)
 }
