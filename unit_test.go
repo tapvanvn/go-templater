@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater"
 
@@ -73,6 +74,11 @@ func TestInstructionTemplate(t *testing.T) {
 	templater.AddNamespace("test", rootPath+"/test")
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
+	context.PrintDebug()
+
+	array := gosmartstring.CreateSSArray()
+	array.Stack = append(array.Stack, gosmartstring.CreateString("test"))
+	context.RegisterObject("todo_list", array)
 
 	instructionDo := ss.BuildDo("template",
 		[]ss.IObject{ss.CreateString("test:html/index.html")}, context)
@@ -81,7 +87,10 @@ func TestInstructionTemplate(t *testing.T) {
 	stream.AddToken(instructionDo)
 
 	compiler := ss.SSCompiler{}
-	compiler.Compile(&stream, context)
-
-	time.Sleep(time.Second * 2)
+	err := compiler.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+		context.PrintDebug()
+	}
+	time.Sleep(time.Second * 15)
 }

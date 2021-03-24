@@ -1,6 +1,8 @@
 package gotemplater
 
-import "github.com/tapvanvn/gotemplater/tokenize/html"
+import (
+	"github.com/tapvanvn/gotemplater/tokenize/html"
+)
 
 type TemplateBlacksmith struct {
 }

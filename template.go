@@ -85,9 +85,12 @@ func (template *Template) load() error {
 	return nil
 }
 
-func (template *Template) build(context *gosmartstring.SSContext) {
+func (template *Template) build(context *gosmartstring.SSContext) error {
 	fmt.Println("build")
 	compiler := ss.SSCompiler{}
-	template.Stream.Debug(0, nil)
-	compiler.Compile(&template.Stream, context)
+	//template.Stream.Debug(0, nil)
+	template.Context.BindingTo(context)
+	err := compiler.Compile(&template.Stream, template.Context)
+
+	return err
 }

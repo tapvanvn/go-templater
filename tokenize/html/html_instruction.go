@@ -13,11 +13,13 @@ import (
 
 type HTMLInstructionMeaning struct {
 	xml.XMLHightMeaning
+	SS gosmartstring.SmarstringInstructionMeaning
 }
 
 func CreateHTMLInstructionMeaning() HTMLInstructionMeaning {
 	return HTMLInstructionMeaning{
 		XMLHightMeaning: xml.CreateXMLMeaning(),
+		SS:              gosmartstring.CreateSSInstructionMeaning(),
 	}
 }
 
@@ -55,6 +57,7 @@ func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, c
 func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token) {
 
 }
+
 func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, context *gosmartstring.SSContext) error {
 	if strings.Index(HTMLInstructionTagName, ","+token.Content+",") > -1 {
 		//instruction
@@ -130,6 +133,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 				id := strings.TrimSpace(valueToken.Children.ConcatStringContent())
 				fmt.Println("regist id:", id, "address", address)
 				context.Root.RegisterObject(address, gosmartstring.CreateString(id))
+				context.PrintDebug()
 				tmpStream.AddToken(idToken)
 				findID = true
 			}
@@ -174,12 +178,19 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 		if headToken.Type != xml.TokenXMLAttribute {
 			continue
 		}
-		if headToken.Content == "each" {
-			elementToken.Content = headToken.Content
-		} else if headToken.Content == "in" {
-			token.Content = headToken.Content
-		} else if headToken.Content != "" {
-			return errors.New("syntax error unknown" + headToken.Content)
+		attIter := headToken.Children.Iterator()
+		keyToken := attIter.Read()
+		valueToken := attIter.Read()
+
+		if keyToken != nil && valueToken != nil {
+			if keyToken.Content == "each" {
+				elementToken.Content = valueToken.Children.ConcatStringContent()
+
+			} else if keyToken.Content == "in" {
+				token.Content = valueToken.Children.ConcatStringContent()
+			} else if headToken.Content != "" {
+				return errors.New("syntax error unknown" + headToken.Content)
+			}
 		}
 	}
 	tmpChildren.AddToken(outputToken)

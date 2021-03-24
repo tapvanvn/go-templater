@@ -28,7 +28,11 @@ func SSFTemplate(context *ss.SSContext, input ss.IObject, params []ss.IObject) s
 
 				time.Sleep(time.Nanosecond * 10)
 			}
-			template.build(context)
+			err := template.build(context)
+			if err != nil {
+				fmt.Println(err.Error())
+				context.PrintDebug()
+			}
 		}
 	}
 	return nil
