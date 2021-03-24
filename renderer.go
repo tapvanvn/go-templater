@@ -2,6 +2,7 @@ package gotemplater
 
 import (
 	"github.com/tapvanvn/gosmartstring"
+	"github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotokenize"
 )
 
@@ -24,6 +25,17 @@ func (r *Renderer) Compile(stream *gotokenize.TokenStream, context *gosmartstrin
 
 			if err != nil {
 
+				return content, err
+			}
+			content += buildContent
+
+		} else if token.Type == html.TokenOptimized {
+
+			content += token.Content
+		} else if token.Children.Length() > 0 {
+
+			buildContent, err := r.Compile(&token.Children, context)
+			if err != nil {
 				return content, err
 			}
 			content += buildContent
