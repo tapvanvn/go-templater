@@ -86,11 +86,14 @@ func (template *Template) load() error {
 }
 
 func (template *Template) build(context *gosmartstring.SSContext) error {
-	fmt.Println("build")
+
 	compiler := ss.SSCompiler{}
 	//template.Stream.Debug(0, nil)
 	template.Context.BindingTo(context)
+	//template.Context.PrintDebug(0)
 	err := compiler.Compile(&template.Stream, template.Context)
+	fmt.Println("--DEBUG CONTEXT BUILD--", template.ID)
+	template.Context.PrintDebug(0)
 	template.Context.BindingTo(nil)
 	return err
 }
@@ -100,18 +103,18 @@ func (template Template) CanExport() bool {
 }
 
 func (template Template) Export(context *gosmartstring.SSContext) []byte {
-	fmt.Println("Export template")
-	template.Stream.Debug(0, nil)
-	fmt.Println("Debug current context")
+
 	template.Context.BindingTo(context)
-	template.Context.PrintDebug()
+	//template.Context.PrintDebug(0)
 	var content = ""
-	/*renderer := Renderer{}
+	renderer := CreateRenderer()
 	content, err := renderer.Compile(&template.Stream, template.Context)
 	if err != nil {
 		//TODO: report error
 		fmt.Println(err.Error())
-	}*/
+	}
+	fmt.Println("--DEBUG CONTEXT RENDER-- ", template.ID)
+	template.Context.PrintDebug(0)
 	template.Context.BindingTo(nil)
 	return []byte(content)
 }

@@ -74,10 +74,13 @@ func TestInstructionTemplate(t *testing.T) {
 	templater.AddNamespace("test", rootPath+"/test")
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
-	context.PrintDebug()
+	//context.PrintDebug(0)
 
 	array := gosmartstring.CreateSSArray()
-	array.Stack = append(array.Stack, gosmartstring.CreateString("test"))
+
+	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 1"))
+	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 2"))
+
 	context.RegisterObject("todo_list", array)
 
 	instructionDo := ss.BuildDo("template",
@@ -90,11 +93,11 @@ func TestInstructionTemplate(t *testing.T) {
 	err := compiler.Compile(&stream, context)
 	if err != nil {
 		fmt.Println(err.Error())
-		context.PrintDebug()
+		context.PrintDebug(0)
 	}
 
 	fmt.Println("-----FINISH------")
-	renderer := gotemplater.Renderer{}
+	renderer := gotemplater.CreateRenderer()
 	resultContent, err := renderer.Compile(&stream, context)
 	if err != nil {
 		fmt.Println(err.Error())

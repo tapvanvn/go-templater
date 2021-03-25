@@ -72,17 +72,28 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 		if value != nil && value.Type == xml.TokenXMLString {
 			content := value.Children.ConcatStringContent()
 			if strings.Index(content, "{{") > -1 {
-				fmt.Println("found smartstring at" + key.Content)
-				meaning.SS.Prepare(&value.Children, context)
+
+				valueContent := value.Content
+				if value.Type == xml.TokenXMLString {
+					valueContent = value.Children.ConcatStringContent()
+				}
+				fmt.Println("found smartstring at"+key.Content, "content:", valueContent)
+				context.PrintDebug(0)
+				valueStream := gotokenize.CreateStream()
+				valueStream.Tokenize(valueContent)
+
+				meaning.SS.Prepare(&valueStream, context)
+
 				tmpStream := gotokenize.CreateStream()
-				ssToken := meaning.SS.Next()
+
 				for {
+					ssToken := meaning.SS.Next()
 					if ssToken == nil {
 						break
 					}
 					tmpStream.AddToken(*ssToken)
-					ssToken = meaning.SS.Next()
 				}
+
 				value.Content = ""
 				value.Type = gosmartstring.TokenSSLSmarstring
 				value.Children = tmpStream
@@ -126,6 +137,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 
 func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokenize.Token, context *gosmartstring.SSContext) error {
 
+	fmt.Println("build ins template with context:", context.ID())
 	token.Type = gosmartstring.TokenSSInstructionDo
 	token.Content = "template"
 	tmpStream := gotokenize.CreateStream()
@@ -135,7 +147,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 		return errors.New("syntax error")
 	}
 	output := gotokenize.Token{
-		Type:    gosmartstring.TokenSSRegistryGlobal,
+		Type:    gosmartstring.TokenSSRegistry,
 		Content: context.IssueAddress(),
 	}
 	tmpStream.AddToken(output)
@@ -164,9 +176,8 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 					Content: address,
 				}
 				id := strings.TrimSpace(valueToken.Children.ConcatStringContent())
-				fmt.Println("regist id:", id, "address", address)
+				fmt.Println("register template id:", gotokenize.ColorName(id), "at address", gotokenize.ColorContent(address))
 				context.RegisterObject(address, gosmartstring.CreateString(id))
-				context.PrintDebug()
 				tmpStream.AddToken(idToken)
 				findID = true
 			}
@@ -174,7 +185,6 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 		} else if headToken.Content != "" {
 			return errors.New("syntax error unknow attribute " + headToken.Content)
 		}
-		fmt.Println(headToken.Content, headToken.Children.ConcatStringContent())
 	}
 	token.Children = tmpStream
 
@@ -197,7 +207,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 	}
 	headIter := head.Children.Iterator()
 	outputToken := gotokenize.Token{
-		Type:    gosmartstring.TokenSSRegistryGlobal,
+		Type:    gosmartstring.TokenSSRegistry,
 		Content: context.IssueAddress(),
 	}
 	elementToken := gotokenize.Token{

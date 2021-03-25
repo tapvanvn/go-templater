@@ -35,7 +35,7 @@ func SSFTemplate(context *ss.SSContext, input ss.IObject, params []ss.IObject) s
 			if err != nil {
 
 				fmt.Println(err.Error())
-				context.PrintDebug()
+				context.PrintDebug(0)
 			}
 			return template
 		}

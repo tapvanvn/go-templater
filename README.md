@@ -14,3 +14,6 @@ Implement
 - The language type of template file is base on it's extension. ex: if the template file name is .html or .htm then it's content will be treat as html.
 - A language can be relative with other language base on reality. ex: a html file can contain javascript or css content.
 - In javascript, templater is named _$ in template.
+
+Supported:
+- HTML(+ss)
