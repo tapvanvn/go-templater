@@ -1,6 +1,8 @@
 package gotemplater
 
 import (
+	"fmt"
+
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotokenize"
@@ -47,10 +49,18 @@ func (r *Renderer) Compile(stream *gotokenize.TokenStream, context *gosmartstrin
 
 func (r *Renderer) compileInstructionDo(token *gotokenize.Token, context *gosmartstring.SSContext) (string, error) {
 
+	fmt.Println("render instruction do: ", token.Content)
+
 	iter := token.Children.Iterator()
 	addressToken := iter.Get()
+	fmt.Println("address:", addressToken.Content)
+	fmt.Println("CONTEXT")
+
+	context.PrintDebug()
+
 	obj := context.GetRegistry(addressToken.Content)
 	if obj != nil && obj.Object != nil && obj.Object.CanExport() {
+		fmt.Println("export object:" + obj.Object.GetType())
 		return string(obj.Object.Export(context)), nil
 	}
 	return "", nil

@@ -24,8 +24,6 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 
 func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
 	meaning.HTMLInstructionMeaning.Prepare(stream, context)
-	fmt.Println("optmize prepare")
-	meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
 
 	tmpStream := gotokenize.CreateStream()
 	for {
@@ -35,8 +33,6 @@ func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, cont
 		}
 		meaning.optimizeToken(token, &tmpStream)
 	}
-	fmt.Println("optimized")
-	tmpStream.Debug(0, nil)
 
 	content := ""
 	tmpStream2 := gotokenize.CreateStream()
@@ -141,7 +137,7 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 				outStream.AddToken(*val)
 			}
 		}
-	} else if token.Type == 0 || token.Type == 1 {
+	} else if token.Type == 0 || token.Type == xml.TokenXMLSpace || token.Type == xml.TokenXMLOperator {
 		outStream.AddToken(gotokenize.Token{
 			Type:    TokenOptimized,
 			Content: token.Content,
@@ -152,7 +148,7 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			Content: token.Content + token.Children.ConcatStringContent() + token.Content,
 		})
 	} else {
-		fmt.Println("unoptmize", token.Type, token.Content)
+
 		outStream.AddToken(*token)
 	}
 }
