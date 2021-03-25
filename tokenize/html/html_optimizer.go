@@ -24,7 +24,7 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 
 func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
 	meaning.HTMLInstructionMeaning.Prepare(stream, context)
-
+	meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
 	tmpStream := gotokenize.CreateStream()
 	for {
 		token := meaning.HTMLInstructionMeaning.Next()

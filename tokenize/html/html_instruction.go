@@ -47,6 +47,12 @@ func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, c
 				fmt.Println(err.Error())
 				continue
 			}
+		} else if token.Type == xml.TokenXMLString {
+			continue
+		} else if token.Type == 0 {
+			continue
+		} else {
+			continue
 		}
 
 		tmpStream.AddToken(*token)
@@ -124,9 +130,39 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 			if childToken == nil {
 				break
 			}
-			if err := meaning.buildElement(childToken, context); err != nil {
-				fmt.Println(err.Error())
-				continue
+			if childToken.Type == xml.TokenXMLElement {
+				if err := meaning.buildElement(childToken, context); err != nil {
+					fmt.Println(err.Error())
+					continue
+				}
+			} else if childToken.Type == 0 || childToken.Type == xml.TokenXMLString {
+				content := childToken.Content
+				if childToken.Type == xml.TokenXMLString {
+					content = childToken.Children.ConcatStringContent()
+				}
+
+				if strings.Index(content, "{{") > -1 {
+
+					valueStream := gotokenize.CreateStream()
+					valueStream.Tokenize(content)
+
+					meaning.SS.Prepare(&valueStream, context)
+
+					gatherStream := gotokenize.CreateStream()
+
+					for {
+						ssToken := meaning.SS.Next()
+						if ssToken == nil {
+							break
+						}
+						gatherStream.AddToken(*ssToken)
+					}
+
+					childToken.Content = ""
+					childToken.Type = gosmartstring.TokenSSLSmarstring
+					childToken.Children = gatherStream
+				}
+
 			}
 			tmpStream.AddToken(*childToken)
 		}

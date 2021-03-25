@@ -104,5 +104,5 @@ func TestInstructionTemplate(t *testing.T) {
 	}
 	fmt.Println(resultContent)
 	//stream.Debug(0, nil)
-	time.Sleep(time.Second * 15)
+	time.Sleep(time.Second * 5)
 }
