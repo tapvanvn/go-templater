@@ -5,7 +5,7 @@ import (
 )
 
 type TemplateBuildTool struct {
-	HTML html.HTMLInstructionMeaning
+	HTML html.HTMLOptmizerMeaning
 }
 
 type TemplateRenderTool struct {

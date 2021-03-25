@@ -11,7 +11,7 @@ type TemplateBuildBlacksmith struct {
 func (blacksmith *TemplateBuildBlacksmith) Make() interface{} {
 
 	tool := &TemplateBuildTool{
-		HTML: html.CreateHTMLInstructionMeaning(),
+		HTML: html.CreateHTMLOptmizer(),
 	}
 	return tool
 }

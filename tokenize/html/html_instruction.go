@@ -136,7 +136,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 	}
 	output := gotokenize.Token{
 		Type:    gosmartstring.TokenSSRegistryGlobal,
-		Content: context.Root.IssueAddress(),
+		Content: context.IssueAddress(),
 	}
 	tmpStream.AddToken(output)
 
@@ -165,7 +165,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 				}
 				id := strings.TrimSpace(valueToken.Children.ConcatStringContent())
 				fmt.Println("regist id:", id, "address", address)
-				context.Root.RegisterObject(address, gosmartstring.CreateString(id))
+				context.RegisterObject(address, gosmartstring.CreateString(id))
 				context.PrintDebug()
 				tmpStream.AddToken(idToken)
 				findID = true
@@ -198,7 +198,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 	headIter := head.Children.Iterator()
 	outputToken := gotokenize.Token{
 		Type:    gosmartstring.TokenSSRegistryGlobal,
-		Content: context.Root.IssueAddress(),
+		Content: context.IssueAddress(),
 	}
 	elementToken := gotokenize.Token{
 		Type: gosmartstring.TokenSSRegistry,

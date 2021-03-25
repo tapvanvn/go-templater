@@ -32,6 +32,7 @@ func (r *Renderer) Compile(stream *gotokenize.TokenStream, context *gosmartstrin
 		} else if token.Type == html.TokenOptimized {
 
 			content += token.Content
+
 		} else if token.Children.Length() > 0 {
 
 			buildContent, err := r.Compile(&token.Children, context)

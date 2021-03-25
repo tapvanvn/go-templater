@@ -100,8 +100,16 @@ func (template Template) CanExport() bool {
 }
 
 func (template Template) Export(context *gosmartstring.SSContext) []byte {
-
-	return []byte("hehehe")
+	fmt.Println("here")
+	template.Stream.Debug(0, nil)
+	var content = ""
+	//renderer := Renderer{}
+	//content, err := renderer.Compile(&template.Stream, context)
+	//if err != nil {
+	//TODO: report error
+	//	fmt.Println(err.Error())
+	//}
+	return []byte(content)
 }
 
 func (obj Template) GetType() string {

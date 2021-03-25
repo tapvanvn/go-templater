@@ -1,8 +1,11 @@
 package html
 
 import (
+	"fmt"
+
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/xml"
 )
 
 const (
@@ -21,5 +24,135 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 
 func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
 	meaning.HTMLInstructionMeaning.Prepare(stream, context)
+	fmt.Println("optmize prepare")
+	meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
 
+	tmpStream := gotokenize.CreateStream()
+	for {
+		token := meaning.HTMLInstructionMeaning.Next()
+		if token == nil {
+			break
+		}
+		meaning.optimizeToken(token, &tmpStream)
+	}
+	fmt.Println("optimized")
+	tmpStream.Debug(0, nil)
+
+	content := ""
+	tmpStream2 := gotokenize.CreateStream()
+	iter2 := tmpStream.Iterator()
+	for {
+		token := iter2.Read()
+		if token == nil {
+			break
+		}
+		if token.Type == TokenOptimized {
+			content += token.Content
+		} else {
+			if content != "" {
+				tmpStream2.AddToken(gotokenize.Token{
+					Type:    TokenOptimized,
+					Content: content,
+				})
+				content = ""
+			}
+			tmpStream2.AddToken(*token)
+		}
+	}
+	if content != "" {
+		tmpStream2.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: content,
+		})
+		content = ""
+	}
+	fmt.Println("final optimize")
+
+	tmpStream2.Debug(0, nil)
+
+	meaning.SetStream(tmpStream2)
+}
+func (meaning *HTMLOptmizerMeaning) optimizeStream(iter *gotokenize.Iterator, outStream *gotokenize.TokenStream) {
+
+	for {
+		token := iter.Read()
+		if token == nil {
+			break
+		}
+		meaning.optimizeToken(token, outStream)
+	}
+}
+
+//return true if all child token is optmized, fale if atleast one child token is instruction
+func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outStream *gotokenize.TokenStream) {
+
+	if token.Type == xml.TokenXMLElement {
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: "<" + token.Content + " ",
+		})
+		iter := token.Children.Iterator()
+		head := iter.Get()
+		if head != nil && head.Type == xml.TokenXMLElementAttributes {
+			headIter := head.Children.Iterator()
+			meaning.optimizeStream(&headIter, outStream)
+			iter.Read()
+		}
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: ">",
+		})
+		meaning.optimizeStream(&iter, outStream)
+
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: "</" + token.Content + ">",
+		})
+
+	} else if token.Type == xml.TokenXMLAttribute {
+
+		childIter := token.Children.Iterator()
+		key := childIter.Get()
+		val := childIter.GetBy(1)
+		if key != nil && val != nil {
+			outStream.AddToken(gotokenize.Token{
+				Type:    TokenOptimized,
+				Content: "\"" + key.Content + "\"=",
+			})
+		} else if val == nil {
+			outStream.AddToken(gotokenize.Token{
+				Type:    TokenOptimized,
+				Content: key.Content,
+			})
+		}
+		if val != nil {
+			if val.Type == 0 {
+				outStream.AddToken(gotokenize.Token{
+					Type:    TokenOptimized,
+					Content: "\"" + val.Content + "\"",
+				})
+			} else if val.Type == xml.TokenXMLString {
+				outStream.AddToken(gotokenize.Token{
+					Type:    TokenOptimized,
+					Content: "\"" + val.Children.ConcatStringContent() + "\"",
+				})
+			} else {
+
+				outStream.AddToken(*val)
+			}
+		}
+	} else if token.Type == 0 || token.Type == 1 {
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: token.Content,
+		})
+	} else if token.Type == xml.TokenXMLString {
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: token.Content + token.Children.ConcatStringContent() + token.Content,
+		})
+	} else {
+		fmt.Println("unoptmize", token.Type, token.Content)
+		outStream.AddToken(*token)
+	}
 }
