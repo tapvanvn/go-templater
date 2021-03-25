@@ -39,7 +39,7 @@ func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, c
 			//remove comment
 			continue
 		}
-		if token.Type == xml.TokenXMLElement {
+		if token.Type == xml.TokenXMLElement || token.Type == xml.TokenXMLEndElement {
 
 			if err := meaning.buildElement(token, context); err != nil {
 				//TODO report error
@@ -127,7 +127,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 			if childToken == nil {
 				break
 			}
-			if childToken.Type == xml.TokenXMLElement {
+			if childToken.Type == xml.TokenXMLElement || childToken.Type == xml.TokenXMLEndElement {
 				if err := meaning.buildElement(childToken, context); err != nil {
 					fmt.Println(err.Error())
 					continue
