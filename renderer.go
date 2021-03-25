@@ -2,7 +2,6 @@ package gotemplater
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
@@ -82,12 +81,7 @@ func (r *Renderer) compileInstructionEach(token *gotokenize.Token, context *gosm
 			return "", errors.New("runtime error " + obj.Object.GetType())
 		} else {
 			context.SetStackRegistry(addressStack)
-			for stactId, stack := range addressStack.Address {
-				for address, translate := range stack {
-					fmt.Println("stack:", stactId, address, translate)
-				}
-			}
-			defer context.SetStackRegistry(nil)
+
 			i := 0
 			offset := iter.Offset
 			stackNum := addressStack.GetStackNum()
@@ -97,15 +91,17 @@ func (r *Renderer) compileInstructionEach(token *gotokenize.Token, context *gosm
 					break
 				}
 				addressStack.SetStack(i)
-				context.DebugCurrentStack()
+				//context.DebugCurrentStack()
 				iter.Seek(offset)
 				renderContent, err := r.compileStream(&iter, context)
 				if err != nil {
+					context.SetStackRegistry(nil)
 					return content, nil
 				}
 				content += renderContent
 				i++
 			}
+			context.SetStackRegistry(nil)
 		}
 	}
 	return content, nil
@@ -116,21 +112,21 @@ func (r *Renderer) compileInstructionDo(token *gotokenize.Token, context *gosmar
 	iter := token.Children.Iterator()
 	addressToken := iter.Get()
 
-	fmt.Println("do:", token.Content, "address:", addressToken.Content)
+	//fmt.Println("do:", token.Content, "address:", addressToken.Content)
 
 	obj := context.GetRegistry(addressToken.Content)
 
 	if obj != nil && obj.Object != nil {
 
-		fmt.Println("found", obj.Object.GetType())
+		//fmt.Println("found", obj.Object.GetType())
 
 		if obj.Object.CanExport() {
 
 			return string(obj.Object.Export(context)), nil
 		}
-	} else {
-		fmt.Println("not found")
-		context.PrintDebug(0)
-	}
+	} //else {
+	//	fmt.Println("not found")
+	//	context.PrintDebug(0)
+	//}
 	return "", nil
 }

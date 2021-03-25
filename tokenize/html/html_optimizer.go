@@ -1,8 +1,6 @@
 package html
 
 import (
-	"fmt"
-
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/xml"
@@ -24,7 +22,6 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 
 func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
 	meaning.HTMLInstructionMeaning.Prepare(stream, context)
-	meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
 	tmpStream := gotokenize.CreateStream()
 	for {
 		token := meaning.HTMLInstructionMeaning.Next()
@@ -62,9 +59,6 @@ func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, cont
 		})
 		content = ""
 	}
-	fmt.Println("final optimize")
-
-	tmpStream2.Debug(0, nil)
 
 	meaning.SetStream(tmpStream2)
 }

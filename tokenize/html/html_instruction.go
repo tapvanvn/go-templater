@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/xml"
@@ -61,7 +60,7 @@ func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, c
 }
 
 func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, context *gosmartstring.SSContext) {
-	token.Children.Debug(0, nil)
+
 	iter := token.Children.Iterator()
 	for {
 		childToken := iter.Read()
@@ -72,7 +71,7 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 			continue
 		}
 		childIter := childToken.Children.Iterator()
-		key := childIter.Get()
+		_ = childIter.Get()
 		value := childIter.GetAt(1)
 
 		if value != nil && value.Type == xml.TokenXMLString {
@@ -83,8 +82,6 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 				if value.Type == xml.TokenXMLString {
 					valueContent = value.Children.ConcatStringContent()
 				}
-				fmt.Println("found smartstring at"+key.Content, "content:", valueContent)
-				context.PrintDebug(0)
 				valueStream := gotokenize.CreateStream()
 				valueStream.Tokenize(valueContent)
 
@@ -173,7 +170,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 
 func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokenize.Token, context *gosmartstring.SSContext) error {
 
-	fmt.Println("build ins template with context:", context.ID())
+	//fmt.Println("build ins template with context:", context.ID())
 	token.Type = gosmartstring.TokenSSInstructionDo
 	token.Content = "template"
 	tmpStream := gotokenize.CreateStream()
@@ -206,13 +203,13 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 
 		if keyToken != nil && valueToken != nil {
 			if strings.ToLower(keyToken.Content) == "id" {
-				address := uuid.New().String()
+				address := context.IssueAddress()
 				idToken := gotokenize.Token{
 					Type:    gosmartstring.TokenSSRegistry,
 					Content: address,
 				}
 				id := strings.TrimSpace(valueToken.Children.ConcatStringContent())
-				fmt.Println("register template id:", gotokenize.ColorName(id), "at address", gotokenize.ColorContent(address))
+				//fmt.Println("register template id:", gotokenize.ColorName(id), "at address", gotokenize.ColorContent(address))
 				context.RegisterObject(address, gosmartstring.CreateString(id))
 				tmpStream.AddToken(idToken)
 				findID = true
