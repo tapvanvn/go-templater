@@ -97,7 +97,6 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 					tmpStream.AddToken(*ssToken)
 				}
 
-				value.Content = ""
 				value.Type = gosmartstring.TokenSSLSmarstring
 				value.Children = tmpStream
 			}
@@ -136,6 +135,8 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 				content := childToken.Content
 				if childToken.Type == xml.TokenXMLString {
 					content = childToken.Children.ConcatStringContent()
+				} else {
+					childToken.Content = ""
 				}
 
 				if strings.Index(content, "{{") > -1 {
@@ -155,7 +156,6 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 						gatherStream.AddToken(*ssToken)
 					}
 
-					childToken.Content = ""
 					childToken.Type = gosmartstring.TokenSSLSmarstring
 					childToken.Children = gatherStream
 				}

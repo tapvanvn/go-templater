@@ -22,6 +22,7 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 
 func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
 	meaning.HTMLInstructionMeaning.Prepare(stream, context)
+	//meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
 	tmpStream := gotokenize.CreateStream()
 	for {
 		token := meaning.HTMLInstructionMeaning.Next()
@@ -164,6 +165,17 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			Type:    TokenOptimized,
 			Content: token.Content + token.Children.ConcatStringContent() + token.Content,
 		})
+	} else if token.Type == gosmartstring.TokenSSLSmarstring && token.Content != "" {
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: token.Content,
+		})
+		outStream.AddToken(*token)
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: token.Content,
+		})
+
 	} else {
 
 		outStream.AddToken(*token)
