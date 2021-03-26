@@ -120,9 +120,8 @@ func (tpt *templater) Render(id string, context *gosmartstring.SSContext) (strin
 
 func (tpt *templater) GetTemplate(id string) *Template {
 
-	fmt.Println("begin load", id)
 	if template, ok := tpt.loadedTemplate[id]; ok {
-		fmt.Println("template loaded")
+		//fmt.Println("template loaded")
 		return template
 	}
 	template := CreateTemplate(id, TXT)
@@ -164,6 +163,6 @@ func (tpt *templater) GetTemplate(id string) *Template {
 		template: &template,
 	}
 	goworker.AddTask(task)
-	fmt.Println("loading")
+
 	return &template
 }

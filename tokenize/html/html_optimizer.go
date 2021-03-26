@@ -1,8 +1,6 @@
 package html
 
 import (
-	"fmt"
-
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/xml"
@@ -24,7 +22,6 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 
 func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
 	meaning.HTMLInstructionMeaning.Prepare(stream, context)
-	meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
 	tmpStream := gotokenize.CreateStream()
 	for {
 		token := meaning.HTMLInstructionMeaning.Next()
@@ -62,9 +59,6 @@ func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, cont
 		})
 		content = ""
 	}
-	fmt.Println("final optimize")
-
-	tmpStream2.Debug(0, nil)
 
 	meaning.SetStream(tmpStream2)
 }
@@ -104,6 +98,22 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			Type:    TokenOptimized,
 			Content: "</" + token.Content + ">",
 		})
+	} else if token.Type == xml.TokenXMLEndElement {
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: "<" + token.Content + " ",
+		})
+		iter := token.Children.Iterator()
+		head := iter.Get()
+		if head != nil && head.Type == xml.TokenXMLElementAttributes {
+			headIter := head.Children.Iterator()
+			meaning.optimizeStream(&headIter, outStream)
+			iter.Read()
+		}
+		outStream.AddToken(gotokenize.Token{
+			Type:    TokenOptimized,
+			Content: "/>",
+		})
 
 	} else if token.Type == xml.TokenXMLAttribute {
 
@@ -113,7 +123,7 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 		if key != nil && val != nil {
 			outStream.AddToken(gotokenize.Token{
 				Type:    TokenOptimized,
-				Content: "\"" + key.Content + "\"=",
+				Content: " " + key.Content + "=",
 			})
 		} else if val == nil {
 			outStream.AddToken(gotokenize.Token{
@@ -130,11 +140,18 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			} else if val.Type == xml.TokenXMLString {
 				outStream.AddToken(gotokenize.Token{
 					Type:    TokenOptimized,
-					Content: "\"" + val.Children.ConcatStringContent() + "\"",
+					Content: val.Content + val.Children.ConcatStringContent() + val.Content,
 				})
 			} else {
-
+				outStream.AddToken(gotokenize.Token{
+					Type:    TokenOptimized,
+					Content: "\"",
+				})
 				outStream.AddToken(*val)
+				outStream.AddToken(gotokenize.Token{
+					Type:    TokenOptimized,
+					Content: "\"",
+				})
 			}
 		}
 	} else if token.Type == 0 || token.Type == xml.TokenXMLSpace || token.Type == xml.TokenXMLOperator {

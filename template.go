@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/utility"
@@ -27,6 +28,7 @@ type Template struct {
 
 	ID           string //each teample has an id, the value is absolute path of that template file
 	Path         []string
+	uid          uuid.UUID
 	Error        error
 	IsReady      bool
 	HostLanguage LanguageType
@@ -38,6 +40,7 @@ type Template struct {
 func CreateTemplate(id string, hostLanguage LanguageType) Template {
 	return Template{
 		IObject:      ss.SSObject{},
+		uid:          uuid.New(),
 		ID:           id,
 		Path:         []string{},
 		Error:        nil,
@@ -88,12 +91,13 @@ func (template *Template) load() error {
 func (template *Template) build(context *gosmartstring.SSContext) error {
 
 	compiler := ss.SSCompiler{}
-	//template.Stream.Debug(0, nil)
+
 	template.Context.BindingTo(context)
-	//template.Context.PrintDebug(0)
+
 	err := compiler.Compile(&template.Stream, template.Context)
-	fmt.Println("--DEBUG CONTEXT BUILD--", template.ID)
-	template.Context.PrintDebug(0)
+
+	//fmt.Println("--DEBUG CONTEXT BUILD--", template.ID, template.uid)
+	//template.Context.PrintDebug(0)
 	template.Context.BindingTo(nil)
 	return err
 }
@@ -113,8 +117,8 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 		//TODO: report error
 		fmt.Println(err.Error())
 	}
-	fmt.Println("--DEBUG CONTEXT RENDER-- ", template.ID)
-	template.Context.PrintDebug(0)
+	//fmt.Println("--DEBUG CONTEXT RENDER-- ", template.ID, template.uid)
+	//template.Context.PrintDebug(0)
 	template.Context.BindingTo(nil)
 	return []byte(content)
 }

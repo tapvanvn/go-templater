@@ -9,15 +9,11 @@ import (
 
 func SSFTemplate(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
 
-	fmt.Println("buidl template:", len(params))
-
 	if len(params) == 1 {
 
 		if sstring, ok := params[0].(*ss.SSString); ok {
 
 			id := sstring.Value
-
-			fmt.Print("build template id:", id)
 
 			templater := GetTemplater()
 			template := templater.GetTemplate(id)

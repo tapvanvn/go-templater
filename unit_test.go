@@ -74,7 +74,6 @@ func TestInstructionTemplate(t *testing.T) {
 	templater.AddNamespace("test", rootPath+"/test")
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
-	//context.PrintDebug(0)
 
 	array := gosmartstring.CreateSSArray()
 
@@ -103,6 +102,7 @@ func TestInstructionTemplate(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(resultContent)
+
 	//stream.Debug(0, nil)
 	time.Sleep(time.Second * 5)
 }
