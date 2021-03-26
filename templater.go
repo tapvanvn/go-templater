@@ -6,7 +6,9 @@ import (
 	"strings"
 
 	"github.com/tapvanvn/gosmartstring"
+	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/utility"
+	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/goworker"
 )
 
@@ -97,22 +99,25 @@ func (tpt *templater) GetPath(id string) ([]string, error) {
 	return utility.GetAbsolutePath(nsPathSegments, relativePath)
 }
 
-/*
-func (tpt *templater) Render(id string, context *Context) (string, error) {
+func (tpt *templater) Render(id string, context *gosmartstring.SSContext) (string, error) {
 
-	/*template := tpt.GetTemplate(id)
+	instructionDo := ss.BuildDo("template",
+		[]ss.IObject{ss.CreateString(id)}, context)
 
-	if template.IsReady {
+	stream := gotokenize.CreateStream()
+	stream.AddToken(instructionDo)
+	compiler := ss.SSCompiler{}
+	err := compiler.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+		context.PrintDebug(0)
+	}
 
-		content, err := template.Render(context)
-		if err != nil {
-			return "", errors.New("render error")
-		}
-		return content, nil
-	}*/ /*
-	return "", errors.New("renderer not ready")
+	renderer := CreateRenderer()
+	return renderer.Compile(&stream, context)
+
 }
-*/
+
 func (tpt *templater) GetTemplate(id string) *Template {
 
 	fmt.Println("begin load", id)

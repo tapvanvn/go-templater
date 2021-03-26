@@ -106,3 +106,28 @@ func TestInstructionTemplate(t *testing.T) {
 	//stream.Debug(0, nil)
 	time.Sleep(time.Second * 5)
 }
+
+func TestInstructionTemplate2(t *testing.T) {
+
+	rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	gotemplater.InitTemplater(1)
+
+	templater := gotemplater.GetTemplater()
+	templater.AddNamespace("test", rootPath+"/test")
+
+	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
+	array := gosmartstring.CreateSSArray()
+
+	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 1"))
+	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 2"))
+
+	context.RegisterObject("todo_list", array)
+
+	resultContent, err := templater.Render("test:html/index.html", context)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(resultContent)
+	//stream.Debug(0, nil)
+	time.Sleep(time.Second * 5)
+}
