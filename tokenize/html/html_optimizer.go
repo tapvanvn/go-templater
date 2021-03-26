@@ -1,6 +1,8 @@
 package html
 
 import (
+	"strings"
+
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/xml"
@@ -111,10 +113,17 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			meaning.optimizeStream(&headIter, outStream)
 			iter.Read()
 		}
-		outStream.AddToken(gotokenize.Token{
-			Type:    TokenOptimized,
-			Content: "/>",
-		})
+		if strings.Index(HTMLSingleTagName, ","+strings.ToLower(token.Content)+",") != -1 {
+			outStream.AddToken(gotokenize.Token{
+				Type:    TokenOptimized,
+				Content: ">",
+			})
+		} else {
+			outStream.AddToken(gotokenize.Token{
+				Type:    TokenOptimized,
+				Content: "/>",
+			})
+		}
 
 	} else if token.Type == xml.TokenXMLAttribute {
 
