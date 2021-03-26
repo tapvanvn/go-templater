@@ -22,6 +22,7 @@ func CreateRenderer() Renderer {
 func (r *Renderer) Compile(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) (string, error) {
 
 	iter := stream.Iterator()
+	//stream.Debug(0, nil)
 	return r.compileStream(&iter, context)
 }
 func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstring.SSContext) (string, error) {
@@ -33,7 +34,7 @@ func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstri
 			break
 		}
 
-		if token.Type == gosmartstring.TokenSSInstructionDo {
+		if token.Type == gosmartstring.TokenSSInstructionDo || token.Type == gosmartstring.TokenSSInstructionExport {
 
 			buildContent, err := r.compileInstructionDo(token, context)
 
@@ -111,7 +112,9 @@ func (r *Renderer) compileInstructionDo(token *gotokenize.Token, context *gosmar
 
 	iter := token.Children.Iterator()
 	addressToken := iter.Get()
-
+	if addressToken.Type == gosmartstring.TokenSSRegistryIgnore {
+		return "", nil
+	}
 	//fmt.Println("do:", token.Content, "address:", addressToken.Content)
 
 	obj := context.GetRegistry(addressToken.Content)
@@ -124,9 +127,9 @@ func (r *Renderer) compileInstructionDo(token *gotokenize.Token, context *gosmar
 
 			return string(obj.Object.Export(context)), nil
 		}
-	} //else {
-	//	fmt.Println("not found")
-	//	context.PrintDebug(0)
-	//}
+	} /*else {
+		fmt.Println("not found", addressToken.Content)
+		//context.PrintDebug(0)
+	}*/
 	return "", nil
 }
