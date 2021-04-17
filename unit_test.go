@@ -138,6 +138,9 @@ func TestInstructionTemplate2(t *testing.T) {
 
 		fmt.Println(err.Error())
 	}
+	templater.ClearCache("test:html/index.html")
+	templater.ClearCache("testabc")
+	templater.ClearAllCache()
 
 	printUtf8(resultContent)
 	fmt.Println()

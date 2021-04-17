@@ -118,6 +118,16 @@ func (tpt *templater) Render(id string, context *gosmartstring.SSContext) (strin
 
 }
 
+func (tpt *templater) ClearAllCache() {
+
+	tpt.loadedTemplate = map[string]*Template{}
+}
+
+func (tpt *templater) ClearCache(id string) {
+
+	delete(tpt.loadedTemplate, id)
+}
+
 func (tpt *templater) GetTemplate(id string) *Template {
 
 	if template, ok := tpt.loadedTemplate[id]; ok {
