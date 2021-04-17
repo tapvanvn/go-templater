@@ -110,6 +110,11 @@ func TestInstructionTemplate(t *testing.T) {
 	time.Sleep(time.Second * 5)
 }
 
+func printUtf8(content string) {
+	for _, c := range content {
+		fmt.Printf("%c", c)
+	}
+}
 func TestInstructionTemplate2(t *testing.T) {
 
 	rootPath, _ := os.Getwd()
@@ -133,7 +138,9 @@ func TestInstructionTemplate2(t *testing.T) {
 
 		fmt.Println(err.Error())
 	}
-	fmt.Println(resultContent)
+
+	printUtf8(resultContent)
+	fmt.Println()
 	//stream.Debug(0, nil)
 	time.Sleep(time.Second * 5)
 }

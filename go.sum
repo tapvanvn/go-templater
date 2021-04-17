@@ -182,6 +182,10 @@ github.com/tapvanvn/gosmartstring v0.0.2-alpha.60 h1:X4SvUEpFTwvBxNAUO05yXOwEBel
 github.com/tapvanvn/gosmartstring v0.0.2-alpha.60/go.mod h1:cHxlXhxN0YaV5LBJAPhNcJUBq9h7ML+Y4Uzs+pdT0Oo=
 github.com/tapvanvn/gosmartstring v0.0.2-alpha.61 h1:0FbpvJBo0y5LOrm2EnRUKHYFkmVMwQfWJGdN63v1igs=
 github.com/tapvanvn/gosmartstring v0.0.2-alpha.61/go.mod h1:cHxlXhxN0YaV5LBJAPhNcJUBq9h7ML+Y4Uzs+pdT0Oo=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.62 h1:38qD4dm5xF84nF8mLRg+tpNJ8pupVVQ0pAVzZyNWAlg=
+github.com/tapvanvn/gosmartstring v0.0.2-alpha.62/go.mod h1:+1THKlvU/hEU24idpqjUQORrDIuyVpX8lNKc2784JXU=
+github.com/tapvanvn/gosmartstring v0.0.2 h1:rqrNhOfn6JE02fErgq7Xc9sqTUs0tlhAUQidIwiCeBU=
+github.com/tapvanvn/gosmartstring v0.0.2/go.mod h1:KJq7Iwy4ITBFxNCHLOms/mu+tcn75o8pS54Y6o5EpZo=
 github.com/tapvanvn/gotokenize v1.0.3/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/gotokenize v1.0.4/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/gotokenize v1.0.5-alpha.1 h1:fm+k8BTQYXpV1pW45BSOvU5kxkP1fu006A3Rnfb70AY=
@@ -200,6 +204,10 @@ github.com/tapvanvn/gotokenize v1.0.5-alpha.7 h1:xvyhJIwdkds0xLz/Y8Cilw4uFelln6a
 github.com/tapvanvn/gotokenize v1.0.5-alpha.7/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/gotokenize v1.0.5-alpha.8 h1:MkFsRNq2I6MU/vhHeQtKUgQUltcoFJybI8dveHXMGQc=
 github.com/tapvanvn/gotokenize v1.0.5-alpha.8/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
+github.com/tapvanvn/gotokenize v1.0.5-alpha.9 h1:oYP9xnAdXg5UlxCCXDnvhV3AVfVnuFfaQm6C3F429ys=
+github.com/tapvanvn/gotokenize v1.0.5-alpha.9/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
+github.com/tapvanvn/gotokenize v1.0.5 h1:bHuNtwpqH4ySIfRZ5zVJ4aToapgP7/XauMRqwFSSSdA=
+github.com/tapvanvn/gotokenize v1.0.5/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/goworker v1.1.0 h1:kdVc3FBmGcHw0NeBeD7XmE5waNyDDOxvY4z23a8xa2U=
 github.com/tapvanvn/goworker v1.1.0/go.mod h1:6VM5Oqp+TLPjVTzqeCyDWXJO/b5qie8C/upOBbP1EZc=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
