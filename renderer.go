@@ -66,6 +66,11 @@ func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstri
 				return content, err
 			}
 			content += buildContent
+		} else {
+			if token.Type == gosmartstring.TokenSSLNormalstring {
+				content += token.Content
+			}
+
 		}
 	}
 	return content, nil

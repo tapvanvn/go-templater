@@ -99,6 +99,7 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 
 				value.Type = gosmartstring.TokenSSLSmarstring
 				value.Children = tmpStream
+				//tmpStream.Debug(0, nil)
 			}
 		}
 	}
@@ -158,6 +159,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 					}
 					childToken.Type = gosmartstring.TokenSSLSmarstring
 					childToken.Children = gatherStream
+					//gatherStream.Debug(0, nil)
 				}
 
 			}

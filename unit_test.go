@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -12,17 +11,21 @@ import (
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater"
-
-	html "github.com/tapvanvn/gotemplater/tokenize/html"
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotokenize/xml"
+
+	"github.com/tapvanvn/gotokenize"
 )
 
 func TestNamespace(t *testing.T) {
 
-	rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	rootPath, _ := os.Getwd()
+
+	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	gotemplater.InitTemplater(1)
 	templater := gotemplater.GetTemplater()
+
+	fmt.Println(rootPath)
 
 	templater.AddNamespace("test", rootPath+"/test")
 	path, err := templater.GetPath("test:html/index.html")
@@ -67,7 +70,7 @@ func TestNamespace(t *testing.T) {
 
 func TestInstructionTemplate(t *testing.T) {
 
-	rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	rootPath, _ := os.Getwd()
 	gotemplater.InitTemplater(1)
 
 	templater := gotemplater.GetTemplater()
@@ -109,7 +112,8 @@ func TestInstructionTemplate(t *testing.T) {
 
 func TestInstructionTemplate2(t *testing.T) {
 
-	rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	rootPath, _ := os.Getwd()
+	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	gotemplater.InitTemplater(1)
 
 	templater := gotemplater.GetTemplater()
@@ -124,7 +128,9 @@ func TestInstructionTemplate2(t *testing.T) {
 	context.RegisterObject("todo_list", array)
 
 	resultContent, err := templater.Render("test:html/index.html", context)
+
 	if err != nil {
+
 		fmt.Println(err.Error())
 	}
 	fmt.Println(resultContent)

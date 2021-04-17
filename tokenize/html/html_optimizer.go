@@ -153,6 +153,7 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 					Content: val.Content + val.Children.ConcatStringContent() + val.Content,
 				})
 			} else {
+
 				outStream.AddToken(gotokenize.Token{
 					Type:    TokenOptimized,
 					Content: "\"",
