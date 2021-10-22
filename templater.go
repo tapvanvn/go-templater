@@ -72,7 +72,7 @@ func (tpt *templater) AddNamespace(namespace string, path string) error {
 		} else if segment == ".." {
 			numSegment := len(resultSegments)
 			if numSegment > 0 {
-				resultSegments = resultSegments[0:numSegment]
+				resultSegments = resultSegments[0 : numSegment-1]
 			} else {
 				return errors.New("path error")
 			}
