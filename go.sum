@@ -210,6 +210,8 @@ github.com/tapvanvn/gotokenize v1.0.5 h1:bHuNtwpqH4ySIfRZ5zVJ4aToapgP7/XauMRqwFS
 github.com/tapvanvn/gotokenize v1.0.5/go.mod h1:c1ii3Fn2gjeHTvKYbYBXVpHRqFf8YNmCdmQQEQ7cos4=
 github.com/tapvanvn/goworker v1.1.0 h1:kdVc3FBmGcHw0NeBeD7XmE5waNyDDOxvY4z23a8xa2U=
 github.com/tapvanvn/goworker v1.1.0/go.mod h1:6VM5Oqp+TLPjVTzqeCyDWXJO/b5qie8C/upOBbP1EZc=
+github.com/tapvanvn/goworker v1.1.1 h1:O+xkx/O28mVMg6ul/vtwLOolmkwBQwjQ5qBvKYt7Hzg=
+github.com/tapvanvn/goworker v1.1.1/go.mod h1:6VM5Oqp+TLPjVTzqeCyDWXJO/b5qie8C/upOBbP1EZc=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c/go.mod h1:lB8K/P019DLNhemzwFU4jHLhdvlE6uDZjXFejJXr49I=
 github.com/xdg/stringprep v0.0.0-20180714160509-73f8eece6fdc/go.mod h1:Jhud4/sHMO4oL310DaZAKk9ZaJ08SJfe+sJh0HrGL1Y=

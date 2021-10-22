@@ -55,7 +55,10 @@ func GetTemplater() *templater {
 
 func (tpt *templater) Debug() {
 
-	fmt.Println("debug")
+	fmt.Println("Namespaces")
+	for namespace, path := range tpt.namespaces {
+		fmt.Println(namespace, ":", path)
+	}
 }
 
 //AddNamespace add a namespace
@@ -108,9 +111,11 @@ func (tpt *templater) Render(id string, context *gosmartstring.SSContext) (strin
 	stream.AddToken(instructionDo)
 	compiler := ss.SSCompiler{}
 	err := compiler.Compile(&stream, context)
+
 	if err != nil {
 		fmt.Println(err.Error())
 		context.PrintDebug(0)
+		return "", err
 	}
 
 	renderer := CreateRenderer()
