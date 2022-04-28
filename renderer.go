@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/tokenize/html"
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 type Renderer struct {
@@ -23,7 +23,7 @@ func (r *Renderer) Compile(stream *gotokenize.TokenStream, context *gosmartstrin
 
 	iter := stream.Iterator()
 	//stream.Debug(0, nil)
-	return r.compileStream(&iter, context)
+	return r.compileStream(iter, context)
 }
 func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstring.SSContext) (string, error) {
 
@@ -99,7 +99,7 @@ func (r *Renderer) compileInstructionEach(token *gotokenize.Token, context *gosm
 				addressStack.SetStack(i)
 				//context.DebugCurrentStack()
 				iter.Seek(offset)
-				renderContent, err := r.compileStream(&iter, context)
+				renderContent, err := r.compileStream(iter, context)
 				if err != nil {
 					context.SetStackRegistry(nil)
 					return content, nil

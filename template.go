@@ -10,7 +10,7 @@ import (
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/utility"
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 type LanguageType = int
@@ -46,7 +46,7 @@ func CreateTemplate(id string, hostLanguage LanguageType) Template {
 		Error:        nil,
 		IsReady:      false,
 		HostLanguage: hostLanguage,
-		Stream:       gotokenize.CreateStream(),
+		Stream:       gotokenize.CreateStream(0),
 		Context:      gosmartstring.CreateContext(CreateHTMLRuntime()),
 		instructions: []*gotokenize.Token{},
 	}
@@ -81,7 +81,7 @@ func (template *Template) load() error {
 
 	bytes, _ := ioutil.ReadAll(file)
 
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(string(bytes))
 
 	template.Stream.Tokenize(string(bytes))

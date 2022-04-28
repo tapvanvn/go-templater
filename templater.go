@@ -8,7 +8,7 @@ import (
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/utility"
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 	"github.com/tapvanvn/goworker"
 )
 
@@ -107,7 +107,7 @@ func (tpt *templater) Render(id string, context *gosmartstring.SSContext) (strin
 	instructionDo := ss.BuildDo("template",
 		[]ss.IObject{ss.CreateString(id)}, context)
 
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.AddToken(instructionDo)
 	compiler := ss.SSCompiler{}
 	err := compiler.Compile(&stream, context)

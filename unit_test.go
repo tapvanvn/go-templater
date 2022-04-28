@@ -12,9 +12,9 @@ import (
 	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater"
 	"github.com/tapvanvn/gotemplater/tokenize/html"
-	"github.com/tapvanvn/gotokenize/xml"
+	"github.com/tapvanvn/gotokenize/v2/xml"
 
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 func TestNamespace(t *testing.T) {
@@ -46,13 +46,15 @@ func TestNamespace(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(string(bytes))
 
 	meaning := html.CreateHTMLInstructionMeaning()
-	meaning.Prepare(&stream, ss.CreateContext(gotemplater.CreateHTMLRuntime()))
 
-	token := meaning.Next()
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	meaning.Prepare(proc, ss.CreateContext(gotemplater.CreateHTMLRuntime()))
+
+	token := meaning.Next(proc)
 
 	for {
 		if token == nil {
@@ -60,9 +62,9 @@ func TestNamespace(t *testing.T) {
 		}
 		fmt.Println(token.Type, "[", xml.XMLNaming(token.Type), "]", token.Content)
 		if token.Children.Length() > 0 {
-			token.Children.Debug(1, xml.XMLNaming)
+			token.Children.Debug(1, xml.XMLNaming, nil)
 		}
-		token = meaning.Next()
+		token = meaning.Next(proc)
 	}
 
 	fmt.Println(strings.Join(path, "/"))
@@ -88,7 +90,7 @@ func TestInstructionTemplate(t *testing.T) {
 	instructionDo := ss.BuildDo("template",
 		[]ss.IObject{ss.CreateString("test:html/index.html")}, context)
 
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.AddToken(instructionDo)
 
 	compiler := ss.SSCompiler{}

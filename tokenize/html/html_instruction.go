@@ -6,30 +6,32 @@ import (
 	"strings"
 
 	"github.com/tapvanvn/gosmartstring"
-	"github.com/tapvanvn/gotokenize"
-	"github.com/tapvanvn/gotokenize/xml"
+
+	"github.com/tapvanvn/gotokenize/v2"
+	"github.com/tapvanvn/gotokenize/v2/xml"
 )
 
 type HTMLInstructionMeaning struct {
-	xml.XMLHightMeaning
+	*gotokenize.AbstractMeaning
+	//xml.XMLHightMeaning
 	SS gosmartstring.SmarstringInstructionMeaning
 }
 
 func CreateHTMLInstructionMeaning() HTMLInstructionMeaning {
 	return HTMLInstructionMeaning{
-		XMLHightMeaning: xml.CreateXMLMeaning(),
+		AbstractMeaning: gotokenize.NewAbtractMeaning(xml.NewXMLHighMeaning()),
 		SS:              gosmartstring.CreateSSInstructionMeaning(),
 	}
 }
 
-func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
+func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess, context *gosmartstring.SSContext) {
 
-	meaning.XMLHightMeaning.Prepare(stream)
+	meaning.AbstractMeaning.Prepare(proc)
 
-	tmpStream := gotokenize.CreateStream()
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 	for {
-		token := meaning.XMLHightMeaning.Next()
+		token := meaning.AbstractMeaning.Next(proc)
 
 		if token == nil {
 
@@ -56,7 +58,7 @@ func (meaning *HTMLInstructionMeaning) Prepare(stream *gotokenize.TokenStream, c
 
 		tmpStream.AddToken(*token)
 	}
-	meaning.SetStream(tmpStream)
+	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 }
 
 func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, context *gosmartstring.SSContext) {
@@ -82,15 +84,15 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 				if value.Type == xml.TokenXMLString {
 					valueContent = value.Children.ConcatStringContent()
 				}
-				valueStream := gotokenize.CreateStream()
+				valueStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 				valueStream.Tokenize(valueContent)
+				proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
+				meaning.SS.Prepare(proc, context)
 
-				meaning.SS.Prepare(&valueStream, context)
-
-				tmpStream := gotokenize.CreateStream()
+				tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 				for {
-					ssToken := meaning.SS.Next()
+					ssToken := meaning.SS.Next(proc)
 					if ssToken == nil {
 						break
 					}
@@ -117,7 +119,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 	} else {
 		iter := token.Children.Iterator()
 		head := iter.Read()
-		tmpStream := gotokenize.CreateStream()
+		tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 		if head != nil {
 			meaning.buildHead(head, context)
 			tmpStream.AddToken(*head)
@@ -140,15 +142,15 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 
 				if strings.Index(content, "{{") > -1 {
 
-					valueStream := gotokenize.CreateStream()
+					valueStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 					valueStream.Tokenize(content)
+					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
+					meaning.SS.Prepare(proc, context)
 
-					meaning.SS.Prepare(&valueStream, context)
-
-					gatherStream := gotokenize.CreateStream()
+					gatherStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 					for {
-						ssToken := meaning.SS.Next()
+						ssToken := meaning.SS.Next(proc)
 						if ssToken == nil {
 							break
 						}
@@ -175,7 +177,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 	//fmt.Println("build ins template with context:", context.ID())
 	token.Type = gosmartstring.TokenSSInstructionDo
 	token.Content = "template"
-	tmpStream := gotokenize.CreateStream()
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	iter := token.Children.Iterator()
 	head := iter.Read()
 	if head == nil {
@@ -233,7 +235,7 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 	token.Type = gosmartstring.TokenSSInstructionEach
 	//for content is loop pack name
 	token.Content = ""
-	tmpChildren := gotokenize.CreateStream()
+	tmpChildren := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 	iter := token.Children.Iterator()
 	head := iter.Read()

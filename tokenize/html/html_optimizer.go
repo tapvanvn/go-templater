@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/tapvanvn/gosmartstring"
-	"github.com/tapvanvn/gotokenize"
-	"github.com/tapvanvn/gotokenize/xml"
+	"github.com/tapvanvn/gotokenize/v2"
+	"github.com/tapvanvn/gotokenize/v2/xml"
 )
 
 const (
@@ -22,12 +22,12 @@ func CreateHTMLOptmizer() HTMLOptmizerMeaning {
 	}
 }
 
-func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) {
-	meaning.HTMLInstructionMeaning.Prepare(stream, context)
+func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess, context *gosmartstring.SSContext) {
+	meaning.HTMLInstructionMeaning.Prepare(proc, context)
 	//meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
-	tmpStream := gotokenize.CreateStream()
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	for {
-		token := meaning.HTMLInstructionMeaning.Next()
+		token := meaning.HTMLInstructionMeaning.Next(proc)
 		if token == nil {
 			break
 		}
@@ -35,7 +35,7 @@ func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, cont
 	}
 
 	content := ""
-	tmpStream2 := gotokenize.CreateStream()
+	tmpStream2 := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	iter2 := tmpStream.Iterator()
 	for {
 		token := iter2.Read()
@@ -63,7 +63,7 @@ func (meaning *HTMLOptmizerMeaning) Prepare(stream *gotokenize.TokenStream, cont
 		content = ""
 	}
 
-	meaning.SetStream(tmpStream2)
+	proc.SetStream(proc.Context.AncestorTokens, &tmpStream2)
 }
 func (meaning *HTMLOptmizerMeaning) optimizeStream(iter *gotokenize.Iterator, outStream *gotokenize.TokenStream) {
 
@@ -88,14 +88,14 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 		head := iter.Get()
 		if head != nil && head.Type == xml.TokenXMLElementAttributes {
 			headIter := head.Children.Iterator()
-			meaning.optimizeStream(&headIter, outStream)
+			meaning.optimizeStream(headIter, outStream)
 			iter.Read()
 		}
 		outStream.AddToken(gotokenize.Token{
 			Type:    TokenOptimized,
 			Content: ">",
 		})
-		meaning.optimizeStream(&iter, outStream)
+		meaning.optimizeStream(iter, outStream)
 
 		outStream.AddToken(gotokenize.Token{
 			Type:    TokenOptimized,
@@ -110,7 +110,7 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 		head := iter.Get()
 		if head != nil && head.Type == xml.TokenXMLElementAttributes {
 			headIter := head.Children.Iterator()
-			meaning.optimizeStream(&headIter, outStream)
+			meaning.optimizeStream(headIter, outStream)
 			iter.Read()
 		}
 		if strings.Index(HTMLSingleTagName, ","+strings.ToLower(token.Content)+",") != -1 {

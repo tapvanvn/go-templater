@@ -1,7 +1,7 @@
 package gotemplater
 
 import (
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 type TemplateBuildTask struct {
@@ -10,10 +10,14 @@ type TemplateBuildTask struct {
 
 func (task *TemplateBuildTask) Process(tool interface{}) {
 	if templateTool, ok := tool.(*TemplateBuildTool); ok {
-		templateTool.HTML.Prepare(&task.template.Stream, task.template.Context)
-		tmpStream := gotokenize.CreateStream()
+
+		proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &task.template.Stream)
+
+		templateTool.HTML.Prepare(proc, task.template.Context)
+
+		tmpStream := gotokenize.CreateStream(0)
 		for {
-			token := templateTool.HTML.Next()
+			token := templateTool.HTML.Next(proc)
 			if token == nil {
 				break
 			}
