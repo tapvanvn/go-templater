@@ -190,6 +190,8 @@ github.com/tapvanvn/gosmartstring v0.0.3-alpha.1 h1:hvGTZH4ufYMCAoZm/d+Nlmud+cBs
 github.com/tapvanvn/gosmartstring v0.0.3-alpha.1/go.mod h1:savD40lDJPL+v4I7OIcrj2X2Y8nK9rV7/BglNlRsXB8=
 github.com/tapvanvn/gotokenize/v2 v2.1.3 h1:05ySgZ+LOQ/D0+JFN7Rds1wwdBI60v+FbStT8kW7OsM=
 github.com/tapvanvn/gotokenize/v2 v2.1.3/go.mod h1:igN/DI3RTPW+WwTyo04/jz3yrSezq6leZ4x4eua0qUM=
+github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.1 h1:6i6NThW/EGhDewzX3rx/lJvx9O1J/uNnHFF0rTogAEc=
+github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.1/go.mod h1:igN/DI3RTPW+WwTyo04/jz3yrSezq6leZ4x4eua0qUM=
 github.com/tapvanvn/goworker v1.1.0 h1:kdVc3FBmGcHw0NeBeD7XmE5waNyDDOxvY4z23a8xa2U=
 github.com/tapvanvn/goworker v1.1.0/go.mod h1:6VM5Oqp+TLPjVTzqeCyDWXJO/b5qie8C/upOBbP1EZc=
 github.com/tapvanvn/goworker v1.1.1 h1:O+xkx/O28mVMg6ul/vtwLOolmkwBQwjQ5qBvKYt7Hzg=
