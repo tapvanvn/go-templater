@@ -52,7 +52,8 @@ func TestNamespace(t *testing.T) {
 	meaning := html.CreateHTMLInstructionMeaning()
 
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
-	meaning.Prepare(proc, ss.CreateContext(gotemplater.CreateHTMLRuntime()))
+	proc.Context.BindingData = ss.CreateContext(gotemplater.CreateHTMLRuntime())
+	meaning.Prepare(proc)
 
 	token := meaning.Next(proc)
 
@@ -127,6 +128,7 @@ func TestInstructionTemplate2(t *testing.T) {
 	templater.AddNamespace("test", rootPath+"/test")
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
+
 	array := gosmartstring.CreateSSArray()
 
 	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 1"))
@@ -140,12 +142,62 @@ func TestInstructionTemplate2(t *testing.T) {
 
 		fmt.Println(err.Error())
 	}
-	templater.ClearCache("test:html/index.html")
-	templater.ClearCache("testabc")
-	templater.ClearAllCache()
+
+	//templater.ClearCache("test:html/index.html")
+	//templater.ClearCache("testabc")
+	//templater.ClearAllCache()
 
 	printUtf8(resultContent)
 	fmt.Println()
-	//stream.Debug(0, nil)
+
+	time.Sleep(time.Second * 3)
+}
+
+func TestInstructionTemplate3(t *testing.T) {
+
+	rootPath, _ := os.Getwd()
+	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	gotemplater.InitTemplater(1)
+
+	templater := gotemplater.GetTemplater()
+	templater.AddNamespace("test", rootPath+"/test")
+
+	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
+	context.RegisterObject("todo", ss.CreateString("test_todo"))
+
+	resultContent, err := templater.Render("test:html/todo_item.html", context)
+
+	if err != nil {
+
+		fmt.Println(err.Error())
+	}
+	//templater.ClearCache("test:html/index.html")
+	//templater.ClearCache("testabc")
+	//templater.ClearAllCache()
+
+	printUtf8(resultContent)
+	fmt.Println()
+
 	time.Sleep(time.Second * 5)
+}
+
+func TestSmartstring(t *testing.T) {
+
+	context := gosmartstring.CreateContext(gotemplater.CreateHTMLRuntime())
+	content := "{{todo}}"
+	meaning := gosmartstring.CreateSSInstructionMeaning()
+	stream := gotokenize.CreateStream(0)
+	stream.Tokenize(content)
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	meaning.Prepare(proc, context)
+
+	compileStream := gotokenize.CreateStream(0)
+	for {
+		token := meaning.Next(proc)
+		if token == nil {
+			break
+		}
+		compileStream.AddToken(*token)
+	}
+	compileStream.Debug(0, gosmartstring.SSNaming, nil)
 }

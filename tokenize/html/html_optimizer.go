@@ -13,21 +13,24 @@ const (
 )
 
 type HTMLOptmizerMeaning struct {
-	HTMLInstructionMeaning
+	*gotokenize.AbstractMeaning
 }
 
-func CreateHTMLOptmizer() HTMLOptmizerMeaning {
-	return HTMLOptmizerMeaning{
-		HTMLInstructionMeaning: CreateHTMLInstructionMeaning(),
+func CreateHTMLOptmizer() *HTMLOptmizerMeaning {
+
+	return &HTMLOptmizerMeaning{
+
+		AbstractMeaning: gotokenize.NewAbtractMeaning(CreateHTMLInstructionMeaning()),
 	}
 }
 
-func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess, context *gosmartstring.SSContext) {
-	meaning.HTMLInstructionMeaning.Prepare(proc, context)
-	//meaning.HTMLInstructionMeaning.GetStream().Debug(0, nil)
-	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess) {
+
+	meaning.AbstractMeaning.Prepare(proc)
+
+	tmpStream := gotokenize.CreateStream(0)
 	for {
-		token := meaning.HTMLInstructionMeaning.Next(proc)
+		token := meaning.AbstractMeaning.Next(proc)
 		if token == nil {
 			break
 		}
@@ -35,7 +38,7 @@ func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess, con
 	}
 
 	content := ""
-	tmpStream2 := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	tmpStream2 := gotokenize.CreateStream(0)
 	iter2 := tmpStream.Iterator()
 	for {
 		token := iter2.Read()
@@ -101,6 +104,7 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			Type:    TokenOptimized,
 			Content: "</" + token.Content + ">",
 		})
+	} else if token.Type == xml.TokenXMLSingleElement {
 	} else if token.Type == xml.TokenXMLEndElement {
 		outStream.AddToken(gotokenize.Token{
 			Type:    TokenOptimized,
@@ -124,7 +128,49 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 				Content: "/>",
 			})
 		}
+	} else if token.Type == xml.TokenXMLElementAttributes {
 
+		childIter := token.Children.Iterator()
+		for {
+			key := childIter.Read()
+			if key == nil {
+				break
+			}
+			outStream.AddToken(gotokenize.Token{
+				Type:    TokenOptimized,
+				Content: " " + key.Content,
+			})
+			oper := childIter.Get()
+			if oper != nil && oper.Content == "=" {
+				childIter.Read()
+				val := childIter.Read()
+				if val != nil {
+
+					if val.Type == 0 {
+						outStream.AddToken(gotokenize.Token{
+							Type:    TokenOptimized,
+							Content: "=\"" + val.Content + "\"",
+						})
+					} else if val.Type == xml.TokenXMLString {
+						outStream.AddToken(gotokenize.Token{
+							Type:    TokenOptimized,
+							Content: "=" + val.Content + val.Children.ConcatStringContent() + val.Content,
+						})
+					} else {
+
+						outStream.AddToken(gotokenize.Token{
+							Type:    TokenOptimized,
+							Content: "=\"",
+						})
+						outStream.AddToken(*val)
+						outStream.AddToken(gotokenize.Token{
+							Type:    TokenOptimized,
+							Content: "\"",
+						})
+					}
+				}
+			}
+		}
 	} else if token.Type == xml.TokenXMLAttribute {
 
 		childIter := token.Children.Iterator()
@@ -175,7 +221,8 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			Type:    TokenOptimized,
 			Content: token.Content + token.Children.ConcatStringContent() + token.Content,
 		})
-	} else if token.Type == gosmartstring.TokenSSLSmarstring && token.Content != "" {
+	} else if token.Type == gosmartstring.TokenSSLSmartstring && token.Content != "" {
+
 		outStream.AddToken(gotokenize.Token{
 			Type:    TokenOptimized,
 			Content: token.Content,
@@ -185,9 +232,11 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 			Type:    TokenOptimized,
 			Content: token.Content,
 		})
-
 	} else {
-
+		childIter := token.Children.Iterator()
+		tmpStream := gotokenize.CreateStream(0)
+		meaning.optimizeStream(childIter, &tmpStream)
+		token.Children = tmpStream
 		outStream.AddToken(*token)
 	}
 }

@@ -85,6 +85,8 @@ func (template *Template) load() error {
 	stream.Tokenize(string(bytes))
 
 	template.Stream.Tokenize(string(bytes))
+
+	fmt.Println("load template from path:", path)
 	return nil
 }
 
@@ -96,9 +98,8 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 
 	err := compiler.Compile(&template.Stream, template.Context)
 
-	//fmt.Println("--DEBUG CONTEXT BUILD--", template.ID, template.uid)
-	//template.Context.PrintDebug(0)
 	template.Context.BindingTo(nil)
+
 	return err
 }
 
@@ -108,21 +109,21 @@ func (template Template) CanExport() bool {
 
 func (template Template) Export(context *gosmartstring.SSContext) []byte {
 
-	template.Context.BindingTo(context)
-	//template.Context.PrintDebug(0)
 	var content = ""
+
+	template.Context.BindingTo(context)
 	renderer := CreateRenderer()
 	content, err := renderer.Compile(&template.Stream, template.Context)
 	if err != nil {
-		//TODO: report error
+
 		fmt.Println(err.Error())
 	}
-	//fmt.Println("--DEBUG CONTEXT RENDER-- ", template.ID, template.uid)
-	//template.Context.PrintDebug(0)
+
 	template.Context.BindingTo(nil)
+
 	return []byte(content)
 }
 
 func (obj Template) GetType() string {
-	return "template" + obj.ID
+	return "template->" + obj.ID
 }

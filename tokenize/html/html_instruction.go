@@ -13,22 +13,23 @@ import (
 
 type HTMLInstructionMeaning struct {
 	*gotokenize.AbstractMeaning
-	//xml.XMLHightMeaning
 	SS gosmartstring.SmarstringInstructionMeaning
 }
 
-func CreateHTMLInstructionMeaning() HTMLInstructionMeaning {
-	return HTMLInstructionMeaning{
+func CreateHTMLInstructionMeaning() *HTMLInstructionMeaning {
+	return &HTMLInstructionMeaning{
 		AbstractMeaning: gotokenize.NewAbtractMeaning(xml.NewXMLHighMeaning()),
 		SS:              gosmartstring.CreateSSInstructionMeaning(),
 	}
 }
 
-func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess, context *gosmartstring.SSContext) {
+func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(proc)
 
-	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	context := proc.Context.BindingData.(*gosmartstring.SSContext)
+
+	tmpStream := gotokenize.CreateStream(0)
 
 	for {
 		token := meaning.AbstractMeaning.Next(proc)
@@ -58,6 +59,7 @@ func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess, 
 
 		tmpStream.AddToken(*token)
 	}
+
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 }
 
@@ -65,43 +67,46 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 
 	iter := token.Children.Iterator()
 	for {
-		childToken := iter.Read()
-		if childToken == nil {
+
+		keyToken := iter.Read()
+		if keyToken == nil {
 			break
 		}
-		if childToken.Type != xml.TokenXMLAttribute {
-			continue
-		}
-		childIter := childToken.Children.Iterator()
-		_ = childIter.Get()
-		value := childIter.GetAt(1)
+		oper := iter.Get()
+		if oper != nil && oper.Content == "=" {
 
-		if value != nil && value.Type == xml.TokenXMLString {
-			content := value.Children.ConcatStringContent()
-			if strings.Index(content, "{{") > -1 {
+			iter.Read()
+			value := iter.Read()
 
-				valueContent := value.Content
-				if value.Type == xml.TokenXMLString {
-					valueContent = value.Children.ConcatStringContent()
-				}
-				valueStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-				valueStream.Tokenize(valueContent)
-				proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
-				meaning.SS.Prepare(proc, context)
+			if value != nil && value.Type == xml.TokenXMLString {
+				content := value.Children.ConcatStringContent()
+				if strings.Index(content, "{{") > -1 {
 
-				tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-
-				for {
-					ssToken := meaning.SS.Next(proc)
-					if ssToken == nil {
-						break
+					valueContent := value.Content
+					if value.Type == xml.TokenXMLString {
+						valueContent = value.Children.ConcatStringContent()
 					}
-					tmpStream.AddToken(*ssToken)
-				}
+					valueStream := gotokenize.CreateStream(0)
 
-				value.Type = gosmartstring.TokenSSLSmarstring
-				value.Children = tmpStream
-				//tmpStream.Debug(0, nil)
+					valueStream.Tokenize(valueContent)
+
+					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
+
+					meaning.SS.Prepare(proc, context)
+
+					tmpStream := gotokenize.CreateStream(0)
+
+					for {
+						ssToken := meaning.SS.Next(proc)
+						if ssToken == nil {
+							break
+						}
+						tmpStream.AddToken(*ssToken)
+					}
+
+					value.Type = gosmartstring.TokenSSLSmartstring
+					value.Children = tmpStream
+				}
 			}
 		}
 	}
@@ -119,7 +124,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 	} else {
 		iter := token.Children.Iterator()
 		head := iter.Read()
-		tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+		tmpStream := gotokenize.CreateStream(0)
 		if head != nil {
 			meaning.buildHead(head, context)
 			tmpStream.AddToken(*head)
@@ -142,12 +147,13 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 
 				if strings.Index(content, "{{") > -1 {
 
-					valueStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+					valueStream := gotokenize.CreateStream(0)
 					valueStream.Tokenize(content)
+
 					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
 					meaning.SS.Prepare(proc, context)
 
-					gatherStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+					gatherStream := gotokenize.CreateStream(0)
 
 					for {
 						ssToken := meaning.SS.Next(proc)
@@ -159,9 +165,9 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 					if childToken.Type == 0 {
 						childToken.Content = ""
 					}
-					childToken.Type = gosmartstring.TokenSSLSmarstring
+
+					childToken.Type = gosmartstring.TokenSSLSmartstring
 					childToken.Children = gatherStream
-					//gatherStream.Debug(0, nil)
 				}
 
 			}
@@ -177,10 +183,10 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 	//fmt.Println("build ins template with context:", context.ID())
 	token.Type = gosmartstring.TokenSSInstructionDo
 	token.Content = "template"
-	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	tmpStream := gotokenize.CreateStream(0)
 	iter := token.Children.Iterator()
 	head := iter.Read()
-	if head == nil {
+	if head == nil || head.Type != xml.TokenXMLElementAttributes {
 		return errors.New("syntax error")
 	}
 	output := gotokenize.Token{
@@ -189,24 +195,22 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 	}
 	tmpStream.AddToken(output)
 
-	iter = head.Children.Iterator()
+	attIter := head.Children.Iterator()
 	findID := false
+	//head.Debug(10, xml.XMLNaming, nil)
 	for {
-		headToken := iter.Read()
-		if headToken == nil {
+		keyToken := attIter.Read()
+		if keyToken == nil {
 			break
 		}
+		oper := attIter.Get()
+		if oper != nil && oper.Content == "=" {
 
-		if headToken.Type != xml.TokenXMLAttribute {
+			attIter.Read()
+			valueToken := attIter.Read()
 
-			continue
-		}
-		attIter := headToken.Children.Iterator()
-		keyToken := attIter.Read()
-		valueToken := attIter.Read()
-
-		if keyToken != nil && valueToken != nil {
 			if strings.ToLower(keyToken.Content) == "id" {
+
 				address := context.IssueAddress()
 				idToken := gotokenize.Token{
 					Type:    gosmartstring.TokenSSRegistry,
@@ -217,10 +221,8 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 				context.RegisterObject(address, gosmartstring.CreateString(id))
 				tmpStream.AddToken(idToken)
 				findID = true
-			}
 
-		} else if headToken.Content != "" {
-			return errors.New("syntax error unknow attribute " + headToken.Content)
+			}
 		}
 	}
 	token.Children = tmpStream
@@ -233,16 +235,18 @@ func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokeniz
 
 func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Token, context *gosmartstring.SSContext) error {
 	token.Type = gosmartstring.TokenSSInstructionEach
+
 	//for content is loop pack name
 	token.Content = ""
-	tmpChildren := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	tmpChildren := gotokenize.CreateStream(0)
 
 	iter := token.Children.Iterator()
 	head := iter.Read()
-	if head == nil {
+	if head == nil || head.Type != xml.TokenXMLElementAttributes {
+
 		return errors.New("syntax error")
 	}
-	headIter := head.Children.Iterator()
+
 	outputToken := gotokenize.Token{
 		Type:    gosmartstring.TokenSSRegistry,
 		Content: context.IssueAddress(),
@@ -250,26 +254,25 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 	elementToken := gotokenize.Token{
 		Type: gosmartstring.TokenSSRegistry,
 	}
+	attIter := head.Children.Iterator()
 	for {
-		headToken := headIter.Read()
-		if headToken == nil {
+
+		keyToken := attIter.Read()
+		if keyToken == nil {
 			break
 		}
-		if headToken.Type != xml.TokenXMLAttribute {
-			continue
-		}
-		attIter := headToken.Children.Iterator()
-		keyToken := attIter.Read()
-		valueToken := attIter.Read()
+		oper := attIter.Get()
+		if oper != nil && oper.Content == "=" {
 
-		if keyToken != nil && valueToken != nil {
+			attIter.Read()
+			valueToken := attIter.Read()
+
 			if keyToken.Content == "each" {
+
 				elementToken.Content = valueToken.Children.ConcatStringContent()
 
 			} else if keyToken.Content == "in" {
 				token.Content = valueToken.Children.ConcatStringContent()
-			} else if headToken.Content != "" {
-				return errors.New("syntax error unknown" + headToken.Content)
 			}
 		}
 	}
@@ -282,11 +285,15 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 			break
 		}
 		if err := meaning.buildElement(childToken, context); err != nil {
+			fmt.Println("err", err.Error())
 			continue
 		}
 		tmpChildren.AddToken(*childToken)
 	}
 
 	token.Children = tmpChildren
+	//token.Debug(0, HTMLTokenNaming, &gotokenize.DebugOption{
+	//	ExtendTypeSize: 6,
+	//})
 	return nil
 }

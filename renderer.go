@@ -2,10 +2,12 @@ package gotemplater
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotemplater/tokenize/html"
+
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -22,9 +24,10 @@ func CreateRenderer() Renderer {
 func (r *Renderer) Compile(stream *gotokenize.TokenStream, context *gosmartstring.SSContext) (string, error) {
 
 	iter := stream.Iterator()
-	//stream.Debug(0, nil)
+
 	return r.compileStream(iter, context)
 }
+
 func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstring.SSContext) (string, error) {
 
 	content := ""
@@ -52,6 +55,7 @@ func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstri
 
 				return content, err
 			}
+
 			content += buildContent
 
 		} else if token.Type == html.TokenOptimized {
@@ -61,25 +65,36 @@ func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstri
 		} else if token.Children.Length() > 0 {
 
 			buildContent, err := r.Compile(&token.Children, context)
+
 			if err != nil {
 
 				return content, err
 			}
 			content += buildContent
+
 		} else {
+
 			if token.Type == gosmartstring.TokenSSLNormalstring {
+
 				content += token.Content
 			}
-
 		}
 	}
 	return content, nil
 }
+
 func (r *Renderer) compileInstructionEach(token *gotokenize.Token, context *gosmartstring.SSContext) (string, error) {
+	//#0 : address
+	//#1 :
+	//#2 : element name
+
+	//fmt.Println("--begin render each --")
+	//token.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
+	//fmt.Println("--end render each --")
 
 	iter := token.Children.Iterator()
-	addressToken := iter.Read()
-	_ = iter.Read()
+	addressToken := iter.Read() //0
+	_ = iter.Read()             // 1
 	content := ""
 	obj := context.GetRegistry(addressToken.Content)
 	if obj != nil && obj.Object != nil {
@@ -93,14 +108,15 @@ func (r *Renderer) compileInstructionEach(token *gotokenize.Token, context *gosm
 			stackNum := addressStack.GetStackNum()
 
 			for {
-				if i >= stackNum {
+				if i >= stackNum-1 {
 					break
 				}
 				addressStack.SetStack(i)
-				//context.DebugCurrentStack()
+
 				iter.Seek(offset)
 				renderContent, err := r.compileStream(iter, context)
 				if err != nil {
+					fmt.Println("render err:", err.Error())
 					context.SetStackRegistry(nil)
 					return content, nil
 				}
@@ -109,6 +125,8 @@ func (r *Renderer) compileInstructionEach(token *gotokenize.Token, context *gosm
 			}
 			context.SetStackRegistry(nil)
 		}
+	} else {
+		fmt.Println("loop with empty array")
 	}
 	return content, nil
 }
@@ -120,21 +138,15 @@ func (r *Renderer) compileInstructionDo(token *gotokenize.Token, context *gosmar
 	if addressToken.Type == gosmartstring.TokenSSRegistryIgnore {
 		return "", nil
 	}
-	//fmt.Println("do:", token.Content, "address:", addressToken.Content)
 
 	obj := context.GetRegistry(addressToken.Content)
 
 	if obj != nil && obj.Object != nil {
 
-		//fmt.Println("found", obj.Object.GetType())
-
 		if obj.Object.CanExport() {
 
 			return string(obj.Object.Export(context)), nil
 		}
-	} /*else {
-		fmt.Println("not found", addressToken.Content)
-		//context.PrintDebug(0)
-	}*/
+	}
 	return "", nil
 }

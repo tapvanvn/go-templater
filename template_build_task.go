@@ -9,11 +9,12 @@ type TemplateBuildTask struct {
 }
 
 func (task *TemplateBuildTask) Process(tool interface{}) {
+
 	if templateTool, ok := tool.(*TemplateBuildTool); ok {
 
 		proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &task.template.Stream)
-
-		templateTool.HTML.Prepare(proc, task.template.Context)
+		proc.Context.BindingData = task.template.Context
+		templateTool.HTML.Prepare(proc)
 
 		tmpStream := gotokenize.CreateStream(0)
 		for {
@@ -25,7 +26,10 @@ func (task *TemplateBuildTask) Process(tool interface{}) {
 
 			//Todo find instruction
 		}
-		//tmpStream.Debug(0, nil)
+		//fmt.Println("--build--")
+		//tmpStream.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
+		//fmt.Println("--end build--")
+
 		task.template.Stream = tmpStream
 		task.template.IsReady = true
 	}

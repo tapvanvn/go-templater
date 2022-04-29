@@ -27,11 +27,20 @@ func SSFTemplate(context *ss.SSContext, input ss.IObject, params []ss.IObject) s
 
 				time.Sleep(time.Nanosecond * 10)
 			}
+
 			err := template.build(context)
 			if err != nil {
+				if id == "test:html/todo_item.html" {
+					fmt.Println("--begin debug item error--")
+					fmt.Println(err.Error())
 
-				fmt.Println(err.Error())
-				context.PrintDebug(0)
+					fmt.Println("---debug item context--")
+					context.PrintDebug(0)
+
+					fmt.Println("--end debug item error--")
+				} else {
+					context.PrintDebug(0)
+				}
 			}
 			return template
 		}

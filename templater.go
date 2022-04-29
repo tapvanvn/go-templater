@@ -42,8 +42,11 @@ func InitTemplater(numWorker int) error {
 	}
 	return errors.New("templater already init")
 }
+
 func GetTemplater() *templater {
+
 	if Templater == nil {
+
 		if err := InitTemplater(1); err != nil {
 			panic(err)
 		}
@@ -95,7 +98,9 @@ func (tpt *templater) GetPath(id string) ([]string, error) {
 		relativePath = relativePath[sep+1:]
 	}
 	nsPathSegments, ok := tpt.namespaces[namespace]
+
 	if !ok {
+
 		return nil, errors.New("namespace is not defined")
 	}
 
@@ -110,17 +115,14 @@ func (tpt *templater) Render(id string, context *gosmartstring.SSContext) (strin
 	stream := gotokenize.CreateStream(0)
 	stream.AddToken(instructionDo)
 	compiler := ss.SSCompiler{}
-	err := compiler.Compile(&stream, context)
-
-	if err != nil {
+	if err := compiler.Compile(&stream, context); err != nil {
 		fmt.Println(err.Error())
 		context.PrintDebug(0)
 		return "", err
 	}
-
+	//return "", nil
 	renderer := CreateRenderer()
 	return renderer.Compile(&stream, context)
-
 }
 
 func (tpt *templater) ClearAllCache() {
