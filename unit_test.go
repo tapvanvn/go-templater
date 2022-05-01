@@ -183,13 +183,20 @@ func TestInstructionTemplate3(t *testing.T) {
 
 func TestSmartstring(t *testing.T) {
 
+	content := "{{context.bcd}}"
+
 	context := gosmartstring.CreateContext(gotemplater.CreateHTMLRuntime())
-	content := "{{todo}}"
+
+	strmap := gosmartstring.CreateSSStringMap()
+	strmap.Set("bcd", gosmartstring.CreateString("value"))
+	context.Root.RegisterObject("context", strmap)
+
 	meaning := gosmartstring.CreateSSInstructionMeaning()
 	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(content)
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
-	meaning.Prepare(proc, context)
+	proc.Context.BindingData = context
+	meaning.Prepare(proc)
 
 	compileStream := gotokenize.CreateStream(0)
 	for {
@@ -199,5 +206,12 @@ func TestSmartstring(t *testing.T) {
 		}
 		compileStream.AddToken(*token)
 	}
+	renderer := gotemplater.CreateRenderer()
+	content, err := renderer.Compile(&compileStream, context)
+	if err != nil {
+
+		fmt.Println(err.Error())
+	}
 	compileStream.Debug(0, gosmartstring.SSNaming, nil)
+	fmt.Println(content)
 }

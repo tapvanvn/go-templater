@@ -91,8 +91,8 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 					valueStream.Tokenize(valueContent)
 
 					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
-
-					meaning.SS.Prepare(proc, context)
+					proc.Context.BindingData = context
+					meaning.SS.Prepare(proc)
 
 					tmpStream := gotokenize.CreateStream(0)
 
@@ -151,7 +151,8 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 					valueStream.Tokenize(content)
 
 					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
-					meaning.SS.Prepare(proc, context)
+					proc.Context.BindingData = context
+					meaning.SS.Prepare(proc)
 
 					gatherStream := gotokenize.CreateStream(0)
 
