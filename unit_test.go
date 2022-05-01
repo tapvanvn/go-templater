@@ -71,6 +71,46 @@ func TestNamespace(t *testing.T) {
 	fmt.Println(strings.Join(path, "/"))
 }
 
+func TestHTMLTokenize(t *testing.T) {
+
+	rootPath, _ := os.Getwd()
+	gotemplater.InitTemplater(1)
+
+	templater := gotemplater.GetTemplater()
+	templater.AddNamespace("test", rootPath+"/test")
+
+	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
+
+	context.RegisterObject("todo", gosmartstring.CreateString("todo 1"))
+
+	dic := ss.CreateSSStringMap()
+	dic.Set("x", ss.CreateString("x_value"))
+	context.RegisterObject("dic", dic)
+
+	instructionDo := ss.BuildDo("template",
+		[]ss.IObject{ss.CreateString("test:html/todo_item.html")}, context)
+
+	stream := gotokenize.CreateStream(0)
+	stream.AddToken(instructionDo)
+
+	compiler := ss.SSCompiler{}
+	err := compiler.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+		context.PrintDebug(0)
+	}
+
+	fmt.Println("-----FINISH------")
+	renderer := gotemplater.CreateRenderer()
+	resultContent, err := renderer.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(resultContent)
+
+	//stream.Debug(0, nil)
+	time.Sleep(time.Second * 5)
+}
 func TestInstructionTemplate(t *testing.T) {
 
 	rootPath, _ := os.Getwd()
@@ -130,11 +170,14 @@ func TestInstructionTemplate2(t *testing.T) {
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
 
 	array := gosmartstring.CreateSSArray()
-
 	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 1"))
 	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 2"))
 
+	dic := gosmartstring.CreateSSStringMap()
+	dic.Set("x", ss.CreateString("x_value"))
+
 	context.RegisterObject("todo_list", array)
+	context.RegisterObject("dic", dic)
 
 	resultContent, err := templater.Render("test:html/index.html", context)
 
@@ -183,7 +226,7 @@ func TestInstructionTemplate3(t *testing.T) {
 
 func TestSmartstring(t *testing.T) {
 
-	content := "{{context.bcd}}"
+	content := `abc {{context.bcd("d")}} f`
 
 	context := gosmartstring.CreateContext(gotemplater.CreateHTMLRuntime())
 

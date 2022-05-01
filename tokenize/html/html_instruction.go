@@ -26,7 +26,9 @@ func CreateHTMLInstructionMeaning() *HTMLInstructionMeaning {
 func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(proc)
-
+	fmt.Println("--begin prepare---")
+	proc.Stream.Debug(0, HTMLTokenNaming, HTMLDebugOption)
+	fmt.Println("--end prepare---")
 	context := proc.Context.BindingData.(*gosmartstring.SSContext)
 
 	tmpStream := gotokenize.CreateStream(0)
@@ -144,9 +146,13 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 				if childToken.Type == xml.TokenXMLString {
 					content = childToken.Children.ConcatStringContent()
 				}
+				testPos := strings.Index(content, "{{")
+				if testPos > -1 {
 
-				if strings.Index(content, "{{") > -1 {
-
+					endPos := strings.Index(content, "}}")
+					if endPos == -1 {
+						meaning.continueSmartstring(iter, &content)
+					}
 					valueStream := gotokenize.CreateStream(0)
 					valueStream.Tokenize(content)
 
@@ -177,6 +183,27 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 		token.Children = tmpStream
 	}
 	return nil
+}
+func (meaning *HTMLInstructionMeaning) continueSmartstring(iter *gotokenize.Iterator, content *string) {
+	for {
+		childToken := iter.Read()
+		if childToken == nil {
+			break
+		}
+		if childToken.Type == xml.TokenXMLSpace || childToken.Type == gotokenize.TokenSpace {
+			continue
+		} else if childToken.Type == xml.TokenXMLString {
+			*content += childToken.Content + childToken.Children.ConcatStringContent() + childToken.Content
+		} else if childToken.Type == gotokenize.TokenWord {
+			testPos := strings.Index(childToken.Content, "}}")
+			if testPos > -1 {
+				*content += childToken.Content
+				break
+			}
+		} else {
+			break
+		}
+	}
 }
 
 func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokenize.Token, context *gosmartstring.SSContext) error {

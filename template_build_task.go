@@ -1,6 +1,9 @@
 package gotemplater
 
 import (
+	"fmt"
+
+	"github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -26,9 +29,9 @@ func (task *TemplateBuildTask) Process(tool interface{}) {
 
 			//Todo find instruction
 		}
-		//fmt.Println("--build--")
-		//tmpStream.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
-		//fmt.Println("--end build--")
+		fmt.Println("--build--")
+		tmpStream.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
+		fmt.Println("--end build--")
 
 		task.template.Stream = tmpStream
 		task.template.IsReady = true
