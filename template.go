@@ -38,7 +38,7 @@ type Template struct {
 }
 
 func CreateTemplate(id string, hostLanguage LanguageType) Template {
-	return Template{
+	tpl := Template{
 		IObject:      ss.SSObject{},
 		uid:          uuid.New(),
 		ID:           id,
@@ -50,6 +50,8 @@ func CreateTemplate(id string, hostLanguage LanguageType) Template {
 		Context:      gosmartstring.CreateContext(CreateHTMLRuntime()),
 		instructions: []*gotokenize.Token{},
 	}
+	//tpl.Context.DebugLevel = 1
+	return tpl
 }
 
 //GetRelativePath get
@@ -96,7 +98,19 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 
 	template.Context.BindingTo(context)
 
+	// fmt.Println("--before build context--")
+	// context.PrintDebug(0)
+	// fmt.Println("----")
+	// template.Context.PrintDebug(0)
+	// fmt.Println("--end before build context--")
+
 	err := compiler.Compile(&template.Stream, template.Context)
+
+	// fmt.Println("--after build context--")
+	// context.PrintDebug(0)
+	// fmt.Println("----")
+	// template.Context.PrintDebug(0)
+	// fmt.Println("--end after build context--")
 
 	template.Context.BindingTo(nil)
 
@@ -112,6 +126,7 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 	var content = ""
 
 	template.Context.BindingTo(context)
+
 	renderer := CreateRenderer()
 	content, err := renderer.Compile(&template.Stream, template.Context)
 	if err != nil {

@@ -28,7 +28,7 @@ func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(proc)
 
-	tmpStream := gotokenize.CreateStream(0)
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	for {
 		token := meaning.AbstractMeaning.Next(proc)
 		if token == nil {
@@ -38,7 +38,7 @@ func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 	}
 
 	content := ""
-	tmpStream2 := gotokenize.CreateStream(0)
+	tmpStream2 := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	iter2 := tmpStream.Iterator()
 	for {
 		token := iter2.Read()

@@ -7,9 +7,9 @@ import (
 
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
+	"github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotemplater/utility"
 	"github.com/tapvanvn/gotokenize/v2"
-	"github.com/tapvanvn/goworker"
 )
 
 //Templater manage
@@ -19,6 +19,7 @@ type templater struct {
 }
 
 var Templater *templater = nil
+var htmlMeaning *html.HTMLOptmizerMeaning = nil
 
 //InitTemplater should call once at begining of app to init templater
 func InitTemplater(numWorker int) error {
@@ -30,13 +31,8 @@ func InitTemplater(numWorker int) error {
 			namespaces:     map[string][]string{},
 			loadedTemplate: map[string]*Template{},
 		}
-		goworker.AddTool("template_build", &TemplateBuildBlacksmith{})
 
-		if numWorker < 1 {
-			goworker.OrganizeWorker(1)
-		} else {
-			goworker.OrganizeWorker(numWorker)
-		}
+		htmlMeaning = html.CreateHTMLOptmizer()
 
 		return nil
 	}
@@ -175,11 +171,27 @@ func (tpt *templater) GetTemplate(id string) *Template {
 		fmt.Println(err.Error())
 		return &template
 	}
-	//call build template task
-	task := &TemplateBuildTask{
-		template: &template,
+
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &template.Stream)
+	proc.Context.BindingData = template.Context
+
+	htmlMeaning.Prepare(proc)
+
+	tmpStream := gotokenize.CreateStream(0)
+	for {
+		token := htmlMeaning.Next(proc)
+		if token == nil {
+			break
+		}
+		tmpStream.AddToken(*token)
 	}
-	goworker.AddTask(task)
+
+	// fmt.Println("--build--")
+	// tmpStream.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
+	// fmt.Println("--end build--")
+
+	template.Stream = tmpStream
+	template.IsReady = true
 
 	return &template
 }

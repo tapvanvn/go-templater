@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
@@ -16,6 +15,52 @@ import (
 
 	"github.com/tapvanvn/gotokenize/v2"
 )
+
+var compiler = &ss.SSCompiler{}
+
+func createTestContext() *ss.SSContext {
+	runtime := gotemplater.CreateHTMLRuntime()
+	runtime.RegisterFunction("put", SSFPut)
+
+	context := ss.CreateContext(runtime)
+
+	//single todo
+	context.RegisterObject("todo", gosmartstring.CreateString("todo 1"))
+
+	dic := ss.CreateSSStringMap()
+	dic.Set("x", ss.CreateString("x_value"))
+	context.RegisterObject("dic", dic)
+
+	array := gosmartstring.CreateSSArray()
+
+	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 1"))
+	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 2"))
+
+	context.RegisterObject("todo_list", array)
+
+	return context
+}
+
+func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
+	//fmt.Println("call put")
+	if len(params) == 1 {
+		//fmt.Println("call put param")
+		if name, ok := params[0].(*ss.SSString); ok {
+			//fmt.Println("call put param2")
+			formatedName := strings.TrimSpace(name.Value)
+			if formatedName != "" {
+				//fmt.Println("put to ", formatedName)
+
+				hot := context.HotObject()
+				context.RegisterObject(formatedName, hot)
+				if hot == nil {
+					fmt.Println("put nil to ", formatedName)
+				}
+			}
+		}
+	}
+	return nil
+}
 
 func TestNamespace(t *testing.T) {
 
@@ -79,13 +124,7 @@ func TestHTMLTokenize(t *testing.T) {
 	templater := gotemplater.GetTemplater()
 	templater.AddNamespace("test", rootPath+"/test")
 
-	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
-
-	context.RegisterObject("todo", gosmartstring.CreateString("todo 1"))
-
-	dic := ss.CreateSSStringMap()
-	dic.Set("x", ss.CreateString("x_value"))
-	context.RegisterObject("dic", dic)
+	context := createTestContext()
 
 	instructionDo := ss.BuildDo("template",
 		[]ss.IObject{ss.CreateString("test:html/todo_item.html")}, context)
@@ -93,7 +132,6 @@ func TestHTMLTokenize(t *testing.T) {
 	stream := gotokenize.CreateStream(0)
 	stream.AddToken(instructionDo)
 
-	compiler := ss.SSCompiler{}
 	err := compiler.Compile(&stream, context)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -109,7 +147,6 @@ func TestHTMLTokenize(t *testing.T) {
 	fmt.Println(resultContent)
 
 	//stream.Debug(0, nil)
-	time.Sleep(time.Second * 5)
 }
 func TestInstructionTemplate(t *testing.T) {
 
@@ -119,14 +156,7 @@ func TestInstructionTemplate(t *testing.T) {
 	templater := gotemplater.GetTemplater()
 	templater.AddNamespace("test", rootPath+"/test")
 
-	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
-
-	array := gosmartstring.CreateSSArray()
-
-	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 1"))
-	array.Stack = append(array.Stack, gosmartstring.CreateString("todo 2"))
-
-	context.RegisterObject("todo_list", array)
+	context := createTestContext()
 
 	instructionDo := ss.BuildDo("template",
 		[]ss.IObject{ss.CreateString("test:html/index.html")}, context)
@@ -134,7 +164,6 @@ func TestInstructionTemplate(t *testing.T) {
 	stream := gotokenize.CreateStream(0)
 	stream.AddToken(instructionDo)
 
-	compiler := ss.SSCompiler{}
 	err := compiler.Compile(&stream, context)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -149,8 +178,6 @@ func TestInstructionTemplate(t *testing.T) {
 	}
 	fmt.Println(resultContent)
 
-	//stream.Debug(0, nil)
-	time.Sleep(time.Second * 5)
 }
 
 func printUtf8(content string) {
@@ -193,7 +220,6 @@ func TestInstructionTemplate2(t *testing.T) {
 	printUtf8(resultContent)
 	fmt.Println()
 
-	time.Sleep(time.Second * 3)
 }
 
 func TestInstructionTemplate3(t *testing.T) {
@@ -221,12 +247,11 @@ func TestInstructionTemplate3(t *testing.T) {
 	printUtf8(resultContent)
 	fmt.Println()
 
-	time.Sleep(time.Second * 5)
 }
 
 func TestSmartstring(t *testing.T) {
 
-	content := `abc {{context.bcd("d")}} f`
+	content := `abc {{context.bcd}} f`
 
 	context := gosmartstring.CreateContext(gotemplater.CreateHTMLRuntime())
 
@@ -249,12 +274,18 @@ func TestSmartstring(t *testing.T) {
 		}
 		compileStream.AddToken(*token)
 	}
-	renderer := gotemplater.CreateRenderer()
+	if err := compiler.Compile(&compileStream, context); err != nil {
+		t.Fatal(err)
+	}
+	context.PrintDebug(0)
+	/*renderer := gotemplater.CreateRenderer()
 	content, err := renderer.Compile(&compileStream, context)
 	if err != nil {
 
 		fmt.Println(err.Error())
 	}
 	compileStream.Debug(0, gosmartstring.SSNaming, nil)
-	fmt.Println(content)
+	fmt.Println(content)*/
+
+	gotokenize.DebugMeaning(meaning)
 }

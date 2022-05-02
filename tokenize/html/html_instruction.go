@@ -13,7 +13,7 @@ import (
 
 type HTMLInstructionMeaning struct {
 	*gotokenize.AbstractMeaning
-	SS gosmartstring.SmarstringInstructionMeaning
+	SS *gosmartstring.SmarstringInstructionMeaning
 }
 
 func CreateHTMLInstructionMeaning() *HTMLInstructionMeaning {
@@ -26,12 +26,10 @@ func CreateHTMLInstructionMeaning() *HTMLInstructionMeaning {
 func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(proc)
-	fmt.Println("--begin prepare---")
-	proc.Stream.Debug(0, HTMLTokenNaming, HTMLDebugOption)
-	fmt.Println("--end prepare---")
+
 	context := proc.Context.BindingData.(*gosmartstring.SSContext)
 
-	tmpStream := gotokenize.CreateStream(0)
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 	for {
 		token := meaning.AbstractMeaning.Next(proc)
@@ -63,6 +61,10 @@ func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) 
 	}
 
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
+
+	// fmt.Println("--begin prepare---")
+	// proc.Stream.Debug(0, HTMLTokenNaming, HTMLDebugOption)
+	// fmt.Println("--end prepare---")
 }
 
 func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, context *gosmartstring.SSContext) {
@@ -94,9 +96,11 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 
 					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
 					proc.Context.BindingData = context
+					//context.DebugLevel = 1
+
 					meaning.SS.Prepare(proc)
 
-					tmpStream := gotokenize.CreateStream(0)
+					tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 					for {
 						ssToken := meaning.SS.Next(proc)
@@ -105,6 +109,8 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 						}
 						tmpStream.AddToken(*ssToken)
 					}
+
+					//gotokenize.DebugMeaning(meaning.SS)
 
 					value.Type = gosmartstring.TokenSSLSmartstring
 					value.Children = tmpStream
@@ -155,7 +161,8 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 					}
 					valueStream := gotokenize.CreateStream(0)
 					valueStream.Tokenize(content)
-
+					//fmt.Println("ss:", content)
+					//context.DebugLevel = 1
 					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
 					proc.Context.BindingData = context
 					meaning.SS.Prepare(proc)
@@ -201,9 +208,11 @@ func (meaning *HTMLInstructionMeaning) continueSmartstring(iter *gotokenize.Iter
 				break
 			}
 		} else {
+
 			break
 		}
 	}
+	fmt.Println("found:", *content)
 }
 
 func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokenize.Token, context *gosmartstring.SSContext) error {

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
@@ -44,5 +43,5 @@ func main() {
 	printUtf8(resultContent)
 	fmt.Println()
 	//stream.Debug(0, nil)
-	time.Sleep(time.Second * 5)
+
 }
