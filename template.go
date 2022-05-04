@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gosmartstring"
 	ss "github.com/tapvanvn/gosmartstring"
+	"github.com/tapvanvn/gotemplater/tokenize/html"
 	"github.com/tapvanvn/gotemplater/utility"
 	"github.com/tapvanvn/gotokenize/v2"
 )
@@ -99,7 +100,7 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 	template.Context.BindingTo(context)
 
 	if context.DebugLevel > 0 {
-
+		template.Stream.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
 		fmt.Println("--before build context--")
 		context.PrintDebug(0)
 		fmt.Println("----")
@@ -134,28 +135,12 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 	template.Context.ResetErr()
 	renderer := CreateRenderer()
 
-	if context.DebugLevel > 0 {
-
-		fmt.Println("--before render context--")
-		context.PrintDebug(0)
-		fmt.Println("----")
-		template.Context.PrintDebug(0)
-		fmt.Println("--end before render context--")
-	}
-
 	content, err := renderer.Compile(&template.Stream, template.Context)
 	if err != nil {
 
 		fmt.Println(err.Error())
 	}
-	if context.DebugLevel > 1 {
 
-		fmt.Println("--after render context--")
-		context.PrintDebug(0)
-		fmt.Println("----")
-		template.Context.PrintDebug(0)
-		fmt.Println("--end after render context--")
-	}
 	template.Context.BindingTo(nil)
 
 	return []byte(content)
