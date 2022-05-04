@@ -98,20 +98,25 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 	template.Context.ResetErr()
 	template.Context.BindingTo(context)
 
-	// fmt.Println("--before build context--")
-	// context.PrintDebug(0)
-	// fmt.Println("----")
-	// template.Context.PrintDebug(0)
-	// fmt.Println("--end before build context--")
+	if context.DebugLevel > 0 {
+
+		fmt.Println("--before build context--")
+		context.PrintDebug(0)
+		fmt.Println("----")
+		template.Context.PrintDebug(0)
+		fmt.Println("--end before build context--")
+	}
 
 	err := compiler.Compile(&template.Stream, template.Context)
 
-	// fmt.Println("--after build context--")
-	// context.PrintDebug(0)
-	// fmt.Println("----")
-	// template.Context.PrintDebug(0)
-	// fmt.Println("--end after build context--")
+	if context.DebugLevel > 1 {
 
+		fmt.Println("--after build context--")
+		context.PrintDebug(0)
+		fmt.Println("----")
+		template.Context.PrintDebug(0)
+		fmt.Println("--end after build context--")
+	}
 	template.Context.BindingTo(nil)
 
 	return err
@@ -128,12 +133,29 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 	template.Context.BindingTo(context)
 	template.Context.ResetErr()
 	renderer := CreateRenderer()
+
+	if context.DebugLevel > 0 {
+
+		fmt.Println("--before render context--")
+		context.PrintDebug(0)
+		fmt.Println("----")
+		template.Context.PrintDebug(0)
+		fmt.Println("--end before render context--")
+	}
+
 	content, err := renderer.Compile(&template.Stream, template.Context)
 	if err != nil {
 
 		fmt.Println(err.Error())
 	}
+	if context.DebugLevel > 1 {
 
+		fmt.Println("--after render context--")
+		context.PrintDebug(0)
+		fmt.Println("----")
+		template.Context.PrintDebug(0)
+		fmt.Println("--end after render context--")
+	}
 	template.Context.BindingTo(nil)
 
 	return []byte(content)
