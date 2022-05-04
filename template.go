@@ -96,7 +96,7 @@ func (template *Template) load() error {
 func (template *Template) build(context *gosmartstring.SSContext) error {
 
 	compiler := ss.SSCompiler{}
-	template.Context.ResetErr()
+	template.Context.Reset()
 	template.Context.BindingTo(context)
 
 	if context.DebugLevel > 0 {
@@ -132,7 +132,7 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 	var content = ""
 
 	template.Context.BindingTo(context)
-	template.Context.ResetErr()
+	template.Context.Reset()
 	renderer := CreateRenderer()
 
 	content, err := renderer.Compile(&template.Stream, template.Context)
