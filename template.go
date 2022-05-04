@@ -95,7 +95,7 @@ func (template *Template) load() error {
 func (template *Template) build(context *gosmartstring.SSContext) error {
 
 	compiler := ss.SSCompiler{}
-
+	template.Context.ResetErr()
 	template.Context.BindingTo(context)
 
 	// fmt.Println("--before build context--")
@@ -126,7 +126,7 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 	var content = ""
 
 	template.Context.BindingTo(context)
-
+	template.Context.ResetErr()
 	renderer := CreateRenderer()
 	content, err := renderer.Compile(&template.Stream, template.Context)
 	if err != nil {
