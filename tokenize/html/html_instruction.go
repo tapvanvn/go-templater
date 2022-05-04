@@ -128,6 +128,8 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 			return meaning.buildInstructionFor(token, context)
 		case "template":
 			return meaning.buildInstructionTemplate(token, context)
+		case "ssscript":
+			return meaning.buildInstructionSSScript(token, context)
 		}
 	} else {
 		iter := token.Children.Iterator()
@@ -191,6 +193,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 	}
 	return nil
 }
+
 func (meaning *HTMLInstructionMeaning) continueSmartstring(iter *gotokenize.Iterator, content *string) {
 	for {
 		childToken := iter.Read()
@@ -332,5 +335,47 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 	//token.Debug(0, HTMLTokenNaming, &gotokenize.DebugOption{
 	//	ExtendTypeSize: 6,
 	//})
+	return nil
+}
+
+func (meaning *HTMLInstructionMeaning) buildInstructionSSScript(token *gotokenize.Token, context *gosmartstring.SSContext) error {
+	iter := token.Children.Iterator()
+
+	content := ""
+	for {
+		childToken := iter.Read()
+
+		if childToken == nil {
+			break
+		}
+		if childToken.Type == xml.TokenXMLElementAttributes {
+			continue
+		}
+		content += string(childToken.Content)
+	}
+
+	valueStream := gotokenize.CreateStream(0)
+
+	valueStream.Tokenize(content)
+
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
+	proc.Context.BindingData = context
+
+	meaning.SS.Prepare(proc)
+
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+
+	for {
+		ssToken := meaning.SS.Next(proc)
+		if ssToken == nil {
+			break
+		}
+		tmpStream.AddToken(*ssToken)
+	}
+
+	token.Type = gosmartstring.TokenSSLSmartstring
+	token.Children = tmpStream
+	token.Content = ""
+
 	return nil
 }

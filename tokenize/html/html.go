@@ -6,7 +6,7 @@ import (
 	"github.com/tapvanvn/gotokenize/v2/xml"
 )
 
-var HTMLInstructionTagName string = ",for,template,"
+var HTMLInstructionTagName string = ",for,template,ssscript,"
 var HTMLSingleTagName string = ",!doctype,meta,"
 
 func HTMLTokenNaming(tokenType int) string {
