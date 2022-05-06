@@ -57,7 +57,15 @@ func (r *Renderer) compileStream(iter *gotokenize.Iterator, context *gosmartstri
 			}
 
 			content += buildContent
+		} else if token.Type == gosmartstring.TokenSSLSmartstring {
 
+			buildContent, err := r.compileStream(token.Children.Iterator(), context)
+			if err != nil {
+
+				return content, err
+			}
+
+			content += buildContent
 		} else if token.Type == html.TokenOptimized {
 
 			content += token.Content

@@ -21,6 +21,7 @@ var compiler = &ss.SSCompiler{}
 func createTestContext() *ss.SSContext {
 	runtime := gotemplater.CreateHTMLRuntime()
 	runtime.RegisterFunction("put", SSFPut)
+	runtime.RegisterFunction("print", SSFPrint)
 
 	context := ss.CreateContext(runtime)
 
@@ -57,6 +58,18 @@ func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IOb
 					fmt.Println("put nil to ", formatedName)
 				}
 			}
+		}
+	}
+	return nil
+}
+
+func SSFPrint(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
+	fmt.Printf("call ssfprint %d\n", len(params))
+	for i, param := range params {
+		if str, ok := param.(*ss.SSString); ok {
+			fmt.Printf("ssfprint-%d: %s\n", i, str.Value)
+		} else {
+			fmt.Printf("ssfprint-%d: %s\n", i, str.GetType())
 		}
 	}
 	return nil

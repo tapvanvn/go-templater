@@ -136,6 +136,7 @@ func (template Template) Export(context *gosmartstring.SSContext) []byte {
 	renderer := CreateRenderer()
 
 	content, err := renderer.Compile(&template.Stream, template.Context)
+
 	if err != nil {
 
 		fmt.Println(err.Error())
