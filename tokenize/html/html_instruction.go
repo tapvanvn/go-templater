@@ -339,9 +339,10 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 }
 
 func (meaning *HTMLInstructionMeaning) buildInstructionSSScript(token *gotokenize.Token, context *gosmartstring.SSContext) error {
+	fmt.Println("instruction ssscript")
 	iter := token.Children.Iterator()
 
-	content := ""
+	content := "{{"
 	for {
 		childToken := iter.Read()
 
@@ -351,8 +352,14 @@ func (meaning *HTMLInstructionMeaning) buildInstructionSSScript(token *gotokeniz
 		if childToken.Type == xml.TokenXMLElementAttributes {
 			continue
 		}
+		if childToken.Type == xml.TokenXMLString {
+			content += childToken.Content + childToken.Children.ConcatStringContent() + childToken.Content
+			continue
+		}
 		content += string(childToken.Content)
 	}
+	content += "}}"
+	fmt.Println("sscontent:", content)
 
 	valueStream := gotokenize.CreateStream(0)
 
@@ -376,6 +383,8 @@ func (meaning *HTMLInstructionMeaning) buildInstructionSSScript(token *gotokeniz
 	token.Type = gosmartstring.TokenSSLSmartstring
 	token.Children = tmpStream
 	token.Content = ""
-
+	fmt.Println("--ssscript")
+	token.Debug(0, HTMLTokenNaming, HTMLDebugOption)
+	fmt.Println("--end ssscript")
 	return nil
 }

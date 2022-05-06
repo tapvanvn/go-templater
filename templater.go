@@ -12,42 +12,27 @@ import (
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
+var __templater *templater = nil
+var __htmlMeaning *html.HTMLOptmizerMeaning = nil
+
+func init() {
+	gosmartstring.SSInsructionMove(5000)
+	__htmlMeaning = html.CreateHTMLOptmizer()
+	__templater = &templater{
+		namespaces:     map[string][]string{},
+		loadedTemplate: map[string]*Template{},
+	}
+}
+
 //Templater manage
 type templater struct {
 	namespaces     map[string][]string //namespace to path
 	loadedTemplate map[string]*Template
 }
 
-var Templater *templater = nil
-var htmlMeaning *html.HTMLOptmizerMeaning = nil
-
-//InitTemplater should call once at begining of app to init templater
-func InitTemplater(numWorker int) error {
-	if Templater == nil {
-
-		gosmartstring.SSInsructionMove(5000)
-
-		Templater = &templater{
-			namespaces:     map[string][]string{},
-			loadedTemplate: map[string]*Template{},
-		}
-
-		htmlMeaning = html.CreateHTMLOptmizer()
-
-		return nil
-	}
-	return errors.New("templater already init")
-}
-
 func GetTemplater() *templater {
 
-	if Templater == nil {
-
-		if err := InitTemplater(1); err != nil {
-			panic(err)
-		}
-	}
-	return Templater
+	return __templater
 }
 
 //MARK: implement functions
@@ -175,11 +160,11 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &template.Stream)
 	proc.Context.BindingData = template.Context
 
-	htmlMeaning.Prepare(proc)
+	__htmlMeaning.Prepare(proc)
 
 	tmpStream := gotokenize.CreateStream(0)
 	for {
-		token := htmlMeaning.Next(proc)
+		token := __htmlMeaning.Next(proc)
 		if token == nil {
 			break
 		}

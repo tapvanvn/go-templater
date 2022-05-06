@@ -16,8 +16,6 @@ func printUtf8(content string) {
 }
 func main() {
 	rootPath, _ := os.Getwd()
-	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	gotemplater.InitTemplater(1)
 
 	templater := gotemplater.GetTemplater()
 	templater.AddNamespace("test", rootPath+"/test")

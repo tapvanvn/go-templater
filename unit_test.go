@@ -16,6 +16,14 @@ import (
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
+func init() {
+
+	rootPath, _ := os.Getwd()
+
+	templater := gotemplater.GetTemplater()
+	templater.AddNamespace("test", rootPath+"/test")
+}
+
 var compiler = &ss.SSCompiler{}
 
 func createTestContext() *ss.SSContext {
@@ -77,15 +85,8 @@ func SSFPrint(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.I
 
 func TestNamespace(t *testing.T) {
 
-	rootPath, _ := os.Getwd()
-
-	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	gotemplater.InitTemplater(1)
 	templater := gotemplater.GetTemplater()
 
-	fmt.Println(rootPath)
-
-	templater.AddNamespace("test", rootPath+"/test")
 	path, err := templater.GetPath("test:html/index.html")
 	if err != nil {
 		t.Fatal(err)
@@ -131,12 +132,6 @@ func TestNamespace(t *testing.T) {
 
 func TestHTMLTokenize(t *testing.T) {
 
-	rootPath, _ := os.Getwd()
-	gotemplater.InitTemplater(1)
-
-	templater := gotemplater.GetTemplater()
-	templater.AddNamespace("test", rootPath+"/test")
-
 	context := createTestContext()
 
 	instructionDo := ss.BuildDo("template",
@@ -158,16 +153,36 @@ func TestHTMLTokenize(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(resultContent)
-
-	//stream.Debug(0, nil)
 }
+func TestHTMLSSScript(t *testing.T) {
+
+	context := createTestContext()
+
+	instructionDo := ss.BuildDo("template",
+		[]ss.IObject{ss.CreateString("test:html/script.html")}, context)
+
+	stream := gotokenize.CreateStream(0)
+
+	stream.AddToken(instructionDo)
+
+	err := compiler.Compile(&stream, context)
+
+	if err != nil {
+
+		fmt.Println(err.Error())
+		context.PrintDebug(0)
+	}
+
+	fmt.Println("-----FINISH------")
+	renderer := gotemplater.CreateRenderer()
+	resultContent, err := renderer.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(resultContent)
+}
+
 func TestInstructionTemplate(t *testing.T) {
-
-	rootPath, _ := os.Getwd()
-	gotemplater.InitTemplater(1)
-
-	templater := gotemplater.GetTemplater()
-	templater.AddNamespace("test", rootPath+"/test")
 
 	context := createTestContext()
 
@@ -200,12 +215,7 @@ func printUtf8(content string) {
 }
 func TestInstructionTemplate2(t *testing.T) {
 
-	rootPath, _ := os.Getwd()
-	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	gotemplater.InitTemplater(1)
-
 	templater := gotemplater.GetTemplater()
-	templater.AddNamespace("test", rootPath+"/test")
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
 
@@ -237,12 +247,7 @@ func TestInstructionTemplate2(t *testing.T) {
 
 func TestInstructionTemplate3(t *testing.T) {
 
-	rootPath, _ := os.Getwd()
-	//rootPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	gotemplater.InitTemplater(1)
-
 	templater := gotemplater.GetTemplater()
-	templater.AddNamespace("test", rootPath+"/test")
 
 	context := ss.CreateContext(gotemplater.CreateHTMLRuntime())
 	context.RegisterObject("todo", ss.CreateString("test_todo"))

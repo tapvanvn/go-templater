@@ -12,7 +12,7 @@ func SSFTemplate(context *ss.SSContext, input ss.IObject, params []ss.IObject) s
 
 			id := sstring.Value
 
-			templater := GetTemplater()
+			templater := __templater
 			template := templater.GetTemplate(id)
 
 			err := template.build(context)
