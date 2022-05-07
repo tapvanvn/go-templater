@@ -40,7 +40,7 @@ type Template struct {
 
 func CreateTemplate(id string, hostLanguage LanguageType) Template {
 	tpl := Template{
-		IObject:      ss.SSObject{},
+		IObject:      &ss.SSObject{},
 		uid:          uuid.New(),
 		ID:           id,
 		Path:         []string{},

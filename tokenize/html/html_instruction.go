@@ -383,8 +383,8 @@ func (meaning *HTMLInstructionMeaning) buildInstructionSSScript(token *gotokeniz
 	token.Type = gosmartstring.TokenSSLSmartstring
 	token.Children = tmpStream
 	token.Content = ""
-	fmt.Println("--ssscript")
-	token.Debug(0, HTMLTokenNaming, HTMLDebugOption)
-	fmt.Println("--end ssscript")
+	// fmt.Println("--ssscript")
+	// token.Debug(0, HTMLTokenNaming, HTMLDebugOption)
+	// fmt.Println("--end ssscript")
 	return nil
 }

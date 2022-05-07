@@ -52,6 +52,7 @@ func createTestContext() *ss.SSContext {
 
 func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
 	//fmt.Println("call put")
+	hot := context.HotObject()
 	if len(params) == 1 {
 		//fmt.Println("call put param")
 		if name, ok := params[0].(*ss.SSString); ok {
@@ -60,7 +61,6 @@ func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IOb
 			if formatedName != "" {
 				//fmt.Println("put to ", formatedName)
 
-				hot := context.HotObject()
 				context.RegisterObject(formatedName, hot)
 				if hot == nil {
 					fmt.Println("put nil to ", formatedName)
@@ -68,7 +68,7 @@ func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IOb
 			}
 		}
 	}
-	return nil
+	return hot
 }
 
 func SSFPrint(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
