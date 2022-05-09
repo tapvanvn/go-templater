@@ -96,24 +96,24 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 
 					proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &valueStream)
 					proc.Context.BindingData = context
-					//context.DebugLevel = 1
 
 					meaning.SS.Prepare(proc)
-
-					tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-
-					for {
-						ssToken := meaning.SS.Next(proc)
-						if ssToken == nil {
-							break
-						}
-						tmpStream.AddToken(*ssToken)
+					ssToken := gotokenize.Token{
+						Type: gosmartstring.TokenSSLSmartstring,
 					}
 
-					//gotokenize.DebugMeaning(meaning.SS)
+					for {
+						ssChildToken := meaning.SS.Next(proc)
+						if ssChildToken == nil {
+							break
+						}
+						ssToken.Children.AddToken(*ssChildToken)
+					}
 
-					value.Type = gosmartstring.TokenSSLSmartstring
-					value.Children = tmpStream
+					value.Type = gosmartstring.TokenSSInstructionPack
+					value.Children = gotokenize.CreateStream(meaning.GetMeaningLevel())
+					value.Children.AddToken(gotokenize.Token{Type: gosmartstring.TokenSSInstructionReset})
+					value.Children.AddToken(ssToken)
 				}
 			}
 		}
@@ -184,7 +184,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, str
 					if childToken.Type == 0 {
 						childToken.Content = ""
 					}
-
+					stream.AddToken(gotokenize.Token{Type: gosmartstring.TokenSSInstructionReset})
 					childToken.Type = gosmartstring.TokenSSLSmartstring
 					childToken.Children = gatherStream
 				}
@@ -218,7 +218,7 @@ func (meaning *HTMLInstructionMeaning) continueSmartstring(iter *gotokenize.Iter
 			break
 		}
 	}
-	fmt.Println("found:", *content)
+	//fmt.Println("found:", *content)
 }
 
 func (meaning *HTMLInstructionMeaning) buildInstructionTemplate(token *gotokenize.Token, context *gosmartstring.SSContext) error {
