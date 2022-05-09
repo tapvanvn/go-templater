@@ -44,7 +44,7 @@ func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) 
 		}
 		if token.Type == xml.TokenXMLElement || token.Type == xml.TokenXMLEndElement {
 
-			if err := meaning.buildElement(token, context); err != nil {
+			if err := meaning.buildElement(token, &tmpStream, context); err != nil {
 				//TODO report error
 				fmt.Println(err.Error())
 				continue
@@ -62,9 +62,9 @@ func (meaning *HTMLInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) 
 
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 
-	// fmt.Println("--begin prepare---")
+	// fmt.Println("--after html_instruction prepare---")
 	// proc.Stream.Debug(0, HTMLTokenNaming, HTMLDebugOption)
-	// fmt.Println("--end prepare---")
+	// fmt.Println("--end after html_instruction prepare---")
 }
 
 func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, context *gosmartstring.SSContext) {
@@ -120,15 +120,17 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 	}
 }
 
-func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, context *gosmartstring.SSContext) error {
+func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, stream *gotokenize.TokenStream, context *gosmartstring.SSContext) error {
 	if strings.Index(HTMLInstructionTagName, ","+token.Content+",") > -1 {
 		//instruction
 		switch strings.ToLower(token.Content) {
 		case "for":
 			return meaning.buildInstructionFor(token, context)
 		case "template":
+			stream.AddToken(gotokenize.Token{Type: gosmartstring.TokenSSInstructionReset})
 			return meaning.buildInstructionTemplate(token, context)
 		case "ssscript":
+			stream.AddToken(gotokenize.Token{Type: gosmartstring.TokenSSInstructionReset})
 			return meaning.buildInstructionSSScript(token, context)
 		}
 	} else {
@@ -145,8 +147,9 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, con
 				break
 			}
 			if childToken.Type == xml.TokenXMLElement || childToken.Type == xml.TokenXMLEndElement {
-				if err := meaning.buildElement(childToken, context); err != nil {
-					fmt.Println(err.Error())
+				if err := meaning.buildElement(childToken, &tmpStream, context); err != nil {
+					//fmt.Println(err.Error())
+					//TODO: is this safe to continue
 					continue
 				}
 			} else if childToken.Type == 0 || childToken.Type == xml.TokenXMLString {
@@ -324,8 +327,9 @@ func (meaning *HTMLInstructionMeaning) buildInstructionFor(token *gotokenize.Tok
 		if childToken == nil {
 			break
 		}
-		if err := meaning.buildElement(childToken, context); err != nil {
-			fmt.Println("err", err.Error())
+		if err := meaning.buildElement(childToken, &tmpChildren, context); err != nil {
+			//fmt.Println("err", err.Error())
+			//TODO: is this safe to continue
 			continue
 		}
 		tmpChildren.AddToken(*childToken)

@@ -119,7 +119,7 @@ func (tpt *templater) ClearCache(id string) {
 func (tpt *templater) GetTemplate(id string) *Template {
 
 	if template, ok := tpt.loadedTemplate[id]; ok {
-		//fmt.Println("template loaded")
+		//fmt.Println("template loaded:", id)
 		return template
 	}
 	template := CreateTemplate(id, TXT)

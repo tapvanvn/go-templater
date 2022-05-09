@@ -62,21 +62,17 @@ func (template *Template) GetRelativePath(path string) ([]string, error) {
 }
 
 func (template *Template) load() error {
+	if template.Error != nil {
 
-	if !template.IsReady {
-
-		if template.Error != nil {
-
-			return template.Error
-		}
+		return template.Error
 	}
-
 	path := "/" + strings.Join(template.Path, "/")
 
 	//MARK: init route
 	file, err := os.Open(path)
 
 	if err != nil {
+		//fmt.Println(err.Error())
 		return err
 	}
 
@@ -90,6 +86,7 @@ func (template *Template) load() error {
 	template.Stream.Tokenize(string(bytes))
 
 	fmt.Println("load template from path:", path)
+
 	return nil
 }
 
@@ -107,7 +104,7 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 		template.Context.PrintDebug(0)
 		fmt.Println("--end before build context--")
 	}
-
+	context.Reset()
 	err := compiler.Compile(&template.Stream, template.Context)
 
 	if context.DebugLevel > 1 {

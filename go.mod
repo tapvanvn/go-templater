@@ -8,4 +8,4 @@ require (
 	github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.5
 
 )
-//replace github.com/tapvanvn/gosmartstring => ../gosmartstring
+replace github.com/tapvanvn/gosmartstring => ../gosmartstring
