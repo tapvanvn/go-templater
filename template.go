@@ -104,6 +104,7 @@ func (template *Template) build(context *gosmartstring.SSContext) error {
 		template.Context.PrintDebug(0)
 		fmt.Println("--end before build context--")
 	}
+
 	context.Reset()
 	err := compiler.Compile(&template.Stream, template.Context)
 

@@ -155,8 +155,9 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, str
 			} else if childToken.Type == 0 || childToken.Type == xml.TokenXMLString {
 				content := childToken.Content
 				if childToken.Type == xml.TokenXMLString {
-					content = childToken.Children.ConcatStringContent()
+					content = childToken.Content + childToken.Children.ConcatStringContent() + childToken.Content
 				}
+
 				testPos := strings.Index(content, "{{")
 				if testPos > -1 {
 
@@ -206,11 +207,14 @@ func (meaning *HTMLInstructionMeaning) continueSmartstring(iter *gotokenize.Iter
 		if childToken.Type == xml.TokenXMLSpace || childToken.Type == gotokenize.TokenSpace {
 			continue
 		} else if childToken.Type == xml.TokenXMLString {
-			*content += childToken.Content + childToken.Children.ConcatStringContent() + childToken.Content
+			strContent := childToken.Content + childToken.Children.ConcatStringContent() + childToken.Content
+
+			*content = *content + strContent
 		} else if childToken.Type == gotokenize.TokenWord {
 			testPos := strings.Index(childToken.Content, "}}")
+			*content += childToken.Content
 			if testPos > -1 {
-				*content += childToken.Content
+
 				break
 			}
 		} else {
