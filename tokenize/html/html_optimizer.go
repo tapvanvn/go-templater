@@ -29,6 +29,7 @@ func (meaning *HTMLOptmizerMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 	meaning.AbstractMeaning.Prepare(proc)
 
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+
 	for {
 		token := meaning.AbstractMeaning.Next(proc)
 		if token == nil {
@@ -113,8 +114,8 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 		iter := token.Children.Iterator()
 		head := iter.Get()
 		if head != nil && head.Type == xml.TokenXMLElementAttributes {
-			headIter := head.Children.Iterator()
-			meaning.optimizeStream(headIter, outStream)
+
+			meaning.optimizeToken(head, outStream)
 			iter.Read()
 		}
 		if strings.Index(HTMLSingleTagName, ","+strings.ToLower(token.Content)+",") != -1 {
@@ -157,7 +158,6 @@ func (meaning *HTMLOptmizerMeaning) optimizeToken(token *gotokenize.Token, outSt
 							Content: "=" + val.Content + val.Children.ConcatStringContent() + val.Content,
 						})
 					} else {
-
 						outStream.AddToken(gotokenize.Token{
 							Type:    TokenOptimized,
 							Content: "=\"",

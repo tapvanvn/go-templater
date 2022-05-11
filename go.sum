@@ -296,6 +296,8 @@ github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.4 h1:JXtOQiAbxtakmiNkSxdLwEtYwhuM
 github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.4/go.mod h1:igN/DI3RTPW+WwTyo04/jz3yrSezq6leZ4x4eua0qUM=
 github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.5 h1:u85vwCrVouRavsXT/YeG8822Uzv2QWTLozccueWX+rA=
 github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.5/go.mod h1:igN/DI3RTPW+WwTyo04/jz3yrSezq6leZ4x4eua0qUM=
+github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.6 h1:pT8wMjTSt97/pu2O1sHbMlHjhLNB/LdMeur4OvOGsDg=
+github.com/tapvanvn/gotokenize/v2 v2.1.4-alpha.6/go.mod h1:igN/DI3RTPW+WwTyo04/jz3yrSezq6leZ4x4eua0qUM=
 github.com/tapvanvn/goworker v1.1.0 h1:kdVc3FBmGcHw0NeBeD7XmE5waNyDDOxvY4z23a8xa2U=
 github.com/tapvanvn/goworker v1.1.0/go.mod h1:6VM5Oqp+TLPjVTzqeCyDWXJO/b5qie8C/upOBbP1EZc=
 github.com/tapvanvn/goworker v1.1.1 h1:O+xkx/O28mVMg6ul/vtwLOolmkwBQwjQ5qBvKYt7Hzg=

@@ -72,10 +72,11 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 	iter := token.Children.Iterator()
 	for {
 
-		keyToken := iter.Read()
-		if keyToken == nil {
+		keyToken := iter.Get()
+		if keyToken == nil || keyToken.Content == "/" {
 			break
 		}
+		iter.Read()
 		oper := iter.Get()
 		if oper != nil && oper.Content == "=" {
 
@@ -200,19 +201,23 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, str
 
 func (meaning *HTMLInstructionMeaning) continueSmartstring(iter *gotokenize.Iterator, content *string) {
 	for {
-		childToken := iter.Read()
+		childToken := iter.Get()
 		if childToken == nil {
 			break
 		}
 		if childToken.Type == xml.TokenXMLSpace || childToken.Type == gotokenize.TokenSpace {
+			iter.Read()
 			continue
 		} else if childToken.Type == xml.TokenXMLString {
 			strContent := childToken.Content + childToken.Children.ConcatStringContent() + childToken.Content
 
 			*content = *content + strContent
+			iter.Read()
 		} else if childToken.Type == gotokenize.TokenWord {
 			testPos := strings.Index(childToken.Content, "}}")
 			*content += childToken.Content
+
+			iter.Read()
 			if testPos > -1 {
 
 				break
