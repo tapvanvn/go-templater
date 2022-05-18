@@ -22,6 +22,7 @@ const (
 	CSS
 	JSON
 	TXT
+	SS
 )
 
 type Template struct {
@@ -61,7 +62,7 @@ func (template *Template) GetRelativePath(path string) ([]string, error) {
 	return utility.GetAbsolutePath(template.Path, path)
 }
 
-func (template *Template) load() error {
+func (template *Template) load(isSmartstring bool) error {
 	if template.Error != nil {
 
 		return template.Error
@@ -83,7 +84,14 @@ func (template *Template) load() error {
 	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(string(bytes))
 
-	template.Stream.Tokenize(string(bytes))
+	if isSmartstring {
+
+		template.Stream.Tokenize("{{" + string(bytes) + "}}")
+
+	} else {
+
+		template.Stream.Tokenize(string(bytes))
+	}
 
 	fmt.Println("load template from path:", path)
 

@@ -14,9 +14,11 @@ import (
 
 var __templater *templater = nil
 var __htmlMeaning *html.HTMLOptmizerMeaning = nil
+var __ssMeaning *gosmartstring.SmarstringInstructionMeaning = nil
 
 func init() {
 	gosmartstring.SSInsructionMove(5000)
+	__ssMeaning = gosmartstring.CreateSSInstructionMeaning()
 	__htmlMeaning = html.CreateHTMLOptmizer()
 	__templater = &templater{
 		namespaces:     map[string][]string{},
@@ -137,19 +139,24 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	lastSegment := loadPath[numSegment-1]
 
 	extPos := strings.LastIndex(lastSegment, ".")
+	var languageProcessor gotokenize.IMeaning = nil
 	if extPos >= 0 {
 		ext := strings.ToLower(lastSegment[extPos+1:])
 		if ext == "html" || ext == "htm" {
 			template.HostLanguage = HTML
+			languageProcessor = __htmlMeaning
 		} else if ext == "js" {
 			template.HostLanguage = JS
 		} else if ext == "json" {
 			template.HostLanguage = JSON
+		} else if ext == "ss" {
+			template.HostLanguage = SS
+			languageProcessor = __ssMeaning
 		}
 	}
 	template.Path = loadPath
 
-	err = template.load()
+	err = template.load(template.HostLanguage == SS)
 
 	if err != nil {
 		template.Error = err
@@ -160,22 +167,24 @@ func (tpt *templater) GetTemplate(id string) *Template {
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &template.Stream)
 	proc.Context.BindingData = template.Context
 
-	__htmlMeaning.Prepare(proc)
+	if languageProcessor != nil {
+		languageProcessor.Prepare(proc)
 
-	tmpStream := gotokenize.CreateStream(0)
-	for {
-		token := __htmlMeaning.Next(proc)
-		if token == nil {
-			break
+		tmpStream := gotokenize.CreateStream(0)
+		for {
+			token := languageProcessor.Next(proc)
+			if token == nil {
+				break
+			}
+			tmpStream.AddToken(*token)
 		}
-		tmpStream.AddToken(*token)
+		template.Stream = tmpStream
 	}
 
 	// fmt.Println("--build--")
 	// tmpStream.Debug(0, html.HTMLTokenNaming, html.HTMLDebugOption)
 	// fmt.Println("--end build--")
 
-	template.Stream = tmpStream
 	template.IsReady = true
 
 	return &template

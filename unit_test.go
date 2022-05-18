@@ -307,3 +307,28 @@ func TestSmartstring(t *testing.T) {
 
 	gotokenize.DebugMeaning(meaning)
 }
+
+func TestTemplateSS(t *testing.T) {
+
+	context := createTestContext()
+
+	instructionDo := ss.BuildDo("template",
+		[]ss.IObject{ss.CreateString("test:ss/example1.ss")}, context)
+
+	stream := gotokenize.CreateStream(0)
+	stream.AddToken(instructionDo)
+
+	err := compiler.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+		context.PrintDebug(0)
+	}
+
+	fmt.Println("-----FINISH------")
+	renderer := gotemplater.CreateRenderer()
+	resultContent, err := renderer.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(resultContent)
+}
