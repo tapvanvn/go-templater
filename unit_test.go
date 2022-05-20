@@ -332,3 +332,27 @@ func TestTemplateSS(t *testing.T) {
 	}
 	fmt.Println(resultContent)
 }
+func TestMultipleSSAttribute(t *testing.T) {
+
+	context := createTestContext()
+
+	instructionDo := ss.BuildDo("template",
+		[]ss.IObject{ss.CreateString("test:html/test_multiple_ss_attribute.html")}, context)
+
+	stream := gotokenize.CreateStream(0)
+	stream.AddToken(instructionDo)
+
+	err := compiler.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+		context.PrintDebug(0)
+	}
+
+	fmt.Println("-----FINISH------")
+	renderer := gotemplater.CreateRenderer()
+	resultContent, err := renderer.Compile(&stream, context)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(resultContent)
+}

@@ -372,7 +372,6 @@ func (meaning *HTMLInstructionMeaning) buildInstructionSSScript(token *gotokeniz
 		content += string(childToken.Content)
 	}
 	content += "}}"
-	fmt.Println("sscontent:", content)
 
 	valueStream := gotokenize.CreateStream(0)
 
