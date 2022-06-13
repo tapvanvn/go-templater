@@ -102,7 +102,7 @@ func (meaning *HTMLInstructionMeaning) buildHead(token *gotokenize.Token, contex
 					ssToken := gotokenize.Token{
 						Type: gosmartstring.TokenSSLSmartstring,
 					}
-
+					ssToken.Children.AddToken(*gotokenize.NewToken(meaning.GetMeaningLevel(), gosmartstring.TokenSSInstructionReset, ""))
 					for {
 						ssChildToken := meaning.SS.Next(proc)
 						if ssChildToken == nil {
@@ -175,7 +175,7 @@ func (meaning *HTMLInstructionMeaning) buildElement(token *gotokenize.Token, str
 					meaning.SS.Prepare(proc)
 
 					gatherStream := gotokenize.CreateStream(0)
-
+					gatherStream.AddToken(*gotokenize.NewToken(meaning.GetMeaningLevel(), gosmartstring.TokenSSInstructionReset, ""))
 					for {
 						ssToken := meaning.SS.Next(proc)
 						if ssToken == nil {
